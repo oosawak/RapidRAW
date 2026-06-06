@@ -2043,6 +2043,7 @@ export default function Editor({ onBackToLibrary, onContextMenu, transformWrappe
             liveRotation={liveRotation}
             transformState={transformState}
             hasRenderedFirstFrame={hasRenderedFirstFrame}
+            activeRightPanel={activeRightPanel}
           />
         </div>
       </div>

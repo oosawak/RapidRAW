@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Stage, Layer, Ellipse, Line, Transformer, Group, Circle, Rect } from 'react-konva';
 import { PercentCrop, Crop } from 'react-image-crop';
 import { Adjustments, AiPatch, Coord, MaskContainer } from '../../../utils/adjustments';
 import { Mask, SubMask, SubMaskMode, ToolType } from '../right/Masks';
-import { AppSettings, BrushSettings, SelectedImage } from '../../ui/AppProperties';
+import { AppSettings, BrushSettings, SelectedImage, Panel } from '../../ui/AppProperties';
 import { RenderSize } from '../../../hooks/useImageRenderSize';
 import type { OverlayMode } from '../right/CropPanel';
 import CompositionOverlays from './overlays/CompositionOverlays';
+import { useCollabStore } from '../../../store/useCollabStore';
 
 interface CursorPreview {
   visible: boolean;
@@ -69,6 +71,7 @@ interface ImageCanvasProps {
   liveRotation?: number | null;
   transformState: { scale: number; positionX: number; positionY: number };
   hasRenderedFirstFrame: boolean;
+  activeRightPanel: Panel | null;
 }
 
 interface MaskOverlay {
@@ -123,6 +126,49 @@ const OptimizedBrushLine = memo(
         points={flattenedPoints}
         stroke="transparent"
         strokeScaleEnabled={false}
+        perfectDrawEnabled={false}
+        shadowForStrokeEnabled={false}
+      />
+    );
+  },
+);
+
+const OptimizedCollabLine = memo(
+  ({
+    stroke,
+    scale,
+    cropX,
+    cropY,
+    opacity = 1,
+  }: {
+    stroke: {
+      color: string;
+      points: Array<{ x: number; y: number }>;
+      width: number;
+    };
+    scale: number;
+    cropX: number;
+    cropY: number;
+    opacity?: number;
+  }) => {
+    const flattenedPoints = useMemo(() => {
+      const pts = new Float32Array(stroke.points.length * 2);
+      for (let i = 0; i < stroke.points.length; i++) {
+        pts[i * 2] = (stroke.points[i].x - cropX) * scale;
+        pts[i * 2 + 1] = (stroke.points[i].y - cropY) * scale;
+      }
+      return Array.from(pts);
+    }, [stroke.points, scale, cropX, cropY]);
+
+    return (
+      <Line
+        lineCap="round"
+        lineJoin="round"
+        opacity={opacity}
+        points={flattenedPoints}
+        stroke={stroke.color}
+        strokeScaleEnabled={false}
+        strokeWidth={Math.max(1, stroke.width * scale)}
         perfectDrawEnabled={false}
         shadowForStrokeEnabled={false}
       />
@@ -1053,6 +1099,22 @@ const ImageCanvas = memo(
     const [straightenLine, setStraightenLine] = useState<any>(null);
     const isStraightening = useRef(false);
 
+    const { strokes: collabStrokes, localUserId, addLocalStroke: commitCollabStroke } = useCollabStore(
+      useShallow((state) => ({
+        strokes: state.strokes,
+        localUserId: state.localUserId,
+        addLocalStroke: state.addLocalStroke,
+      })),
+    );
+    const [collabDraftPoints, setCollabDraftPoints] = useState<Coord[]>([]);
+    const collabDraftPointsRef = useRef<Coord[]>([]);
+    const collabDrawingRef = useRef(false);
+
+    const setCollabDraftPointsSync = useCallback((next: Coord[]) => {
+      collabDraftPointsRef.current = next;
+      setCollabDraftPoints(next);
+    }, []);
+
     const [displayState, setDisplayState] = useState({
       base: finalPreviewUrl || selectedImage.thumbnailUrl,
       fade: null as string | null,
@@ -1065,6 +1127,7 @@ const ImageCanvas = memo(
     const retainedPatchRef = useRef<typeof interactivePatch>(null);
 
     const isWgpuActive = appSettings?.useWgpuRenderer !== false && selectedImage?.isReady && hasRenderedFirstFrame;
+    const isCollabActive = activeRightPanel === Panel.Collab;
 
     const paddingX = imageRenderSize.width * 0.5;
     const paddingY = imageRenderSize.height * 0.5;
@@ -1098,6 +1161,24 @@ const ImageCanvas = memo(
         };
       },
       [groupOffsetX, groupOffsetY, maxSafeScale],
+    );
+
+    const getImageSpacePointer = useCallback(
+      (stage: any) => {
+        const pos = getCanvasPointer(stage);
+        if (!pos) return null;
+
+        const crop = adjustments.crop;
+        const isPercent = crop?.unit === '%';
+        const cropX = crop ? (isPercent ? (crop.x / 100) * effectiveImageDimensions.width : crop.x) : 0;
+        const cropY = crop ? (isPercent ? (crop.y / 100) * effectiveImageDimensions.height : crop.y) : 0;
+
+        return {
+          x: pos.x / imageRenderSize.scale + cropX,
+          y: pos.y / imageRenderSize.scale + cropY,
+        };
+      },
+      [adjustments.crop, effectiveImageDimensions.height, effectiveImageDimensions.width, getCanvasPointer, imageRenderSize.scale],
     );
 
     useEffect(() => {
@@ -1446,6 +1527,88 @@ const ImageCanvas = memo(
       [isWbPickerActive, finalPreviewUrl, imageRenderSize, onWbPicked, setAdjustments, getCanvasPointer],
     );
 
+
+    const handleCollabStart = useCallback(
+      (e: any) => {
+        if (e.evt && typeof e.evt.button === 'number' && e.evt.button !== 0) {
+          return;
+        }
+
+        const stage = e && typeof e.target?.getStage === 'function' ? e.target.getStage() : drawingStageRef.current;
+        const pointer = stage ? getImageSpacePointer(stage) : null;
+        if (!pointer) return;
+
+        drawingStageRef.current = stage;
+        collabDrawingRef.current = true;
+        setCollabDraftPointsSync([pointer]);
+        if (e.evt && e.evt.cancelable) e.evt.preventDefault();
+      },
+      [getImageSpacePointer, setCollabDraftPointsSync],
+    );
+
+    const handleCollabMove = useCallback(
+      (e: any) => {
+        if (!collabDrawingRef.current) {
+          return;
+        }
+
+        const stage = e && typeof e.target?.getStage === 'function' ? e.target.getStage() : drawingStageRef.current;
+        const pointer = stage ? getImageSpacePointer(stage) : null;
+        if (!pointer) return;
+
+        const nextPoints = (() => {
+          const prev = collabDraftPointsRef.current;
+          const last = prev[prev.length - 1];
+          if (last) {
+            const dx = pointer.x - last.x;
+            const dy = pointer.y - last.y;
+            if (dx * dx + dy * dy < 0.25) {
+              return prev;
+            }
+          }
+          return [...prev, pointer];
+        })();
+        setCollabDraftPointsSync(nextPoints);
+
+        if (e.evt && e.evt.cancelable) e.evt.preventDefault();
+      },
+      [getImageSpacePointer, setCollabDraftPointsSync],
+    );
+
+    const handleCollabEnd = useCallback(() => {
+      if (!collabDrawingRef.current) {
+        return;
+      }
+
+      collabDrawingRef.current = false;
+      drawingStageRef.current = null;
+      const draftPoints = collabDraftPointsRef.current;
+      setCollabDraftPointsSync([]);
+
+      if (draftPoints.length === 0) {
+        return;
+      }
+
+      const safePoints =
+        draftPoints.length === 1 ? [...draftPoints, { ...draftPoints[0] }] : draftPoints.slice();
+      const timestamp = Date.now();
+      const lineWidth = Math.max(1, (brushSettings?.size ?? 8) / Math.max(1, imageRenderSize.scale));
+
+      commitCollabStroke({
+        color: '#f08c46',
+        points: safePoints.map((point, index) => ({
+          ...point,
+          t: timestamp + index * 16,
+        })),
+        source: 'local',
+        stroke_id: `local-${timestamp}-${safePoints.length}`,
+        timestamp: new Date(timestamp).toISOString(),
+        tool: 'brush',
+        user_id: localUserId,
+        width: lineWidth,
+      });
+    }, [brushSettings?.size, commitCollabStroke, imageRenderSize.scale, localUserId, setCollabDraftPointsSync]);
+
     const handleStart = useCallback(
       (e: any) => {
         if (e.evt && typeof e.evt.button === 'number' && e.evt.button !== 0) {
@@ -1456,6 +1619,11 @@ const ImageCanvas = memo(
 
         if (isWbPickerActive) {
           handleWbClick(e);
+          return;
+        }
+
+        if (isCollabActive) {
+          handleCollabStart(e);
           return;
         }
 
@@ -1634,6 +1802,8 @@ const ImageCanvas = memo(
       [
         isWbPickerActive,
         handleWbClick,
+        isCollabActive,
+        handleCollabStart,
         isInitialDrawing,
         isBrushActive,
         activeLineFlow,
@@ -1656,12 +1826,34 @@ const ImageCanvas = memo(
         brushStageSize,
         baseTool,
         getCanvasPointer,
+        getImageSpacePointer,
+        setCollabDraftPointsSync,
       ],
     );
 
     const handleMove = useCallback(
       (e: any) => {
         if (isWbPickerActive) {
+          return;
+        }
+
+        if (collabDrawingRef.current) {
+          const stage = e && typeof e.target?.getStage === 'function' ? e.target.getStage() : drawingStageRef.current;
+          const pointer = stage ? getImageSpacePointer(stage) : null;
+          if (pointer) {
+            setCollabDraftPointsSync((prev) => {
+              const last = prev[prev.length - 1];
+              if (last) {
+                const dx = pointer.x - last.x;
+                const dy = pointer.y - last.y;
+                if (dx * dx + dy * dy < 0.25) {
+                  return prev;
+                }
+              }
+              return [...prev, pointer];
+            });
+          }
+          if (e.evt && e.evt.cancelable) e.evt.preventDefault();
           return;
         }
 
@@ -1683,6 +1875,25 @@ const ImageCanvas = memo(
           } else {
             setCursorPreview((p: CursorPreview) => ({ ...p, visible: false }));
           }
+        }
+
+        if (collabDrawingRef.current) {
+          const pointer = e && typeof e.target?.getStage === 'function' ? getImageSpacePointer(e.target.getStage()) : null;
+          if (pointer) {
+            setCollabDraftPointsSync((prev) => {
+              const last = prev[prev.length - 1];
+              if (last) {
+                const dx = pointer.x - last.x;
+                const dy = pointer.y - last.y;
+                if (dx * dx + dy * dy < 0.25) {
+                  return prev;
+                }
+              }
+              return [...prev, pointer];
+            });
+          }
+          if (e.evt && e.evt.cancelable) e.evt.preventDefault();
+          return;
         }
 
         if (!isDrawing.current || !isToolActive) {
@@ -1838,6 +2049,7 @@ const ImageCanvas = memo(
       [
         isToolActive,
         isWbPickerActive,
+        isCollabActive,
         isInitialDrawing,
         activeMaskId,
         activeAiSubMaskId,
@@ -1861,6 +2073,11 @@ const ImageCanvas = memo(
     );
 
     const handleUp = useCallback(() => {
+      if (collabDrawingRef.current) {
+        handleCollabEnd();
+        return;
+      }
+
       if (!isDrawing.current) {
         return;
       }
@@ -2032,15 +2249,15 @@ const ImageCanvas = memo(
     }, []);
 
     useEffect(() => {
-      if (!isToolActive) return;
+      if (!isToolActive && !isCollabActive) return;
 
       function onGlobalMove(e: MouseEvent | TouchEvent) {
-        if (!isDrawing.current) return;
+        if (!isDrawing.current && !collabDrawingRef.current) return;
         handleMove(e);
       }
 
       function onGlobalUp() {
-        if (!isDrawing.current) return;
+        if (!isDrawing.current && !collabDrawingRef.current) return;
         handleUp();
       }
 
@@ -2054,7 +2271,7 @@ const ImageCanvas = memo(
         window.removeEventListener('touchmove', onGlobalMove);
         window.removeEventListener('touchcancel', onGlobalUp);
       };
-    }, [isToolActive, handleMove, handleUp]);
+    }, [isToolActive, isCollabActive, handleMove, handleUp]);
 
     const handleStraightenMouseDown = (e: any) => {
       if (e.evt.button !== 0 && !e.evt.touches) {
@@ -2227,10 +2444,11 @@ const ImageCanvas = memo(
       if (isWbPickerActive) return 'crosshair';
       if (isParametricActive) return 'crosshair';
       if (isInitialDrawing) return 'crosshair';
+      if (isCollabActive) return 'crosshair';
       if (isBrushActive) return 'none';
       if (isAiSubjectActive) return 'crosshair';
       return cursorStyle;
-    }, [isWbPickerActive, isInitialDrawing, isBrushActive, isAiSubjectActive, isParametricActive, cursorStyle]);
+    }, [isWbPickerActive, isInitialDrawing, isBrushActive, isAiSubjectActive, isParametricActive, isCollabActive, cursorStyle]);
 
     const handlePreviewUpdate = useCallback(
       (id: string, subMaskPreview: Partial<SubMask>) => {
@@ -2487,6 +2705,68 @@ const ImageCanvas = memo(
                           radius={brushCursorPreview.radius}
                           x={cursorPreview.x}
                           y={cursorPreview.y}
+                        />
+                      )}
+                    </Group>
+                  </Group>
+                </Layer>
+              </Stage>
+            </div>
+          )}
+
+          {isCollabActive && (
+            <div
+              style={{
+                position: 'absolute',
+                top: stageTop,
+                left: stageLeft,
+                transformOrigin: '0 0',
+                transform: `scale(${1 / maxSafeScale})`,
+                width: stageWidth * maxSafeScale,
+                height: stageHeight * maxSafeScale,
+                zIndex: 5,
+                touchAction: 'none',
+                userSelect: 'none',
+                opacity: isShowingOriginal ? 0 : 1,
+                transition: 'opacity 150ms ease-in-out',
+                ...getEdgeFadeStyle(128),
+              }}
+            >
+              <Stage
+                width={stageWidth * maxSafeScale}
+                height={stageHeight * maxSafeScale}
+                onMouseDown={handleStart}
+                onTouchStart={handleStart}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onMouseMove={handleMove}
+                onTouchMove={handleMove}
+                onMouseUp={handleUp}
+                onTouchEnd={handleUp}
+              >
+                <Layer listening={!showOriginal}>
+                  <Group scaleX={maxSafeScale} scaleY={maxSafeScale}>
+                    <Group x={groupOffsetX} y={groupOffsetY}>
+                      {collabStrokes.map((stroke) => (
+                        <OptimizedCollabLine
+                          key={stroke.stroke_id}
+                          cropX={(adjustments.crop?.unit === '%' ? (adjustments.crop.x / 100) * effectiveImageDimensions.width : adjustments.crop?.x) || 0}
+                          cropY={(adjustments.crop?.unit === '%' ? (adjustments.crop.y / 100) * effectiveImageDimensions.height : adjustments.crop?.y) || 0}
+                          scale={imageRenderSize.scale}
+                          stroke={stroke}
+                        />
+                      ))}
+                      {collabDraftPoints.length > 0 && (
+                        <OptimizedCollabLine
+                          cropX={(adjustments.crop?.unit === '%' ? (adjustments.crop.x / 100) * effectiveImageDimensions.width : adjustments.crop?.x) || 0}
+                          cropY={(adjustments.crop?.unit === '%' ? (adjustments.crop.y / 100) * effectiveImageDimensions.height : adjustments.crop?.y) || 0}
+                          opacity={0.6}
+                          scale={imageRenderSize.scale}
+                          stroke={{
+                            color: '#f08c46',
+                            points: collabDraftPoints,
+                            width: Math.max(1, (brushSettings?.size ?? 8) / Math.max(1, imageRenderSize.scale)),
+                          }}
                         />
                       )}
                     </Group>
