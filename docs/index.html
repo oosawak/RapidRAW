@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RapidRAW Hub</title>
+    <title>Oekaki Chat Pages</title>
     <meta
       name="description"
-      content="RapidRAW 本体と、今回のデモを切り替えて表示する入口ページ。"
+      content="GitHub Pages 上で確認する、お絵かきチャットとコラボ描画の入口ページ。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -17,64 +17,58 @@
     <div class="app-shell hub-shell">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-mark">R</div>
+          <div class="brand-mark">OC</div>
           <div>
-            <p class="eyebrow">entry point</p>
-            <h1>RapidRAW Hub</h1>
+            <p class="eyebrow">GitHub Pages</p>
+            <h1>Oekaki Chat Hub</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill" id="hubStatusPill">Two destinations</span>
-          <span class="muted" id="hubStatusText">RapidRAW 本体と、今回のデモを切り替えます</span>
+          <span class="status-pill">Preview portal</span>
+          <span class="muted">今作っているものを Pages 上で確認する入口です</span>
         </div>
 
         <div class="topbar-actions">
-          <a class="button button-ghost" href="http://localhost:1420" target="_blank" rel="noreferrer">Open RapidRAW</a>
-          <a class="button button-primary" href="./demo.html">Open Demo</a>
+          <a class="button button-primary" href="./demo.html">Open Preview</a>
         </div>
       </header>
 
       <main class="hub-grid">
         <section class="card hub-intro">
           <div class="card-head">
-            <h2>Choose a view</h2>
-            <span class="chip">landing</span>
+            <h2>What you can see here</h2>
+            <span class="chip">Pages only</span>
           </div>
           <p class="card-copy">
-            まずはこの入口ページから、RapidRAW 本体と今回のデモを切り替えて見られます。
-            下のカードをクリックすると右側のプレビューが切り替わります。
+            ここは GitHub Pages 用の入口です。クリックすると、今作っているコラボ描画の
+            プレビューに移動します。ローカルホストは使いません。
           </p>
 
           <div class="hub-launches">
-            <button class="hub-launch-card is-active" type="button" data-preview-src="./demo.html" data-label="Demo" data-copy="今回の作成中デモ。ブラシ、表示、共通の見た目を確認するページです。">
+            <a class="hub-launch-card is-active" href="./demo.html">
               <span class="hub-card-kicker">Preview</span>
-              <strong>今回のデモ</strong>
-              <span class="hub-card-copy">ブラシと UI を確認する静的デモ</span>
-            </button>
-            <button class="hub-launch-card" type="button" data-preview-src="http://localhost:1420" data-label="RapidRAW" data-copy="RapidRAW 本体です。ローカルで tauri dev / npm run dev を起動していると表示されます。">
-              <span class="hub-card-kicker">App</span>
-              <strong>RapidRAW 本体</strong>
-              <span class="hub-card-copy">実際のアプリ画面を表示</span>
-            </button>
+              <strong>Oekaki Chat Preview</strong>
+              <span class="hub-card-copy">共有ストロークの見た目と操作感を確認するページ</span>
+            </a>
           </div>
 
           <div class="hub-note">
             <strong>Note</strong>
-            <span id="hubNote">今回のデモを先に表示しています。右側のカードを押すと切り替わります。</span>
+            <span>まずはこのページからデモを開いてください。</span>
           </div>
         </section>
 
         <section class="card hub-preview">
           <div class="card-head">
-            <h2 id="previewTitle">Demo</h2>
-            <span class="chip" id="previewChip">./demo.html</span>
+            <h2>Live preview</h2>
+            <span class="chip">./demo.html</span>
           </div>
           <div class="preview-frame-wrap">
-            <iframe id="previewFrame" title="RapidRAW preview" src="./demo.html"></iframe>
+            <iframe id="previewFrame" title="Oekaki Chat preview" src="./demo.html"></iframe>
             <div class="preview-fallback" id="previewFallback">
               <strong>Preview target</strong>
-              <span>ラフな切替表示です。表示されない場合はボタンから別タブで開いてください。</span>
+              <span>表示されない場合は Open Preview を押してください。</span>
             </div>
           </div>
         </section>

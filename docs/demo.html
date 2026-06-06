@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RapidRAW Studio Demo</title>
+    <title>Oekaki Chat Preview</title>
     <meta
       name="description"
-      content="RapidRAW 風の写真編集スタジオ。ローカル画像の読み込み、調整、PNG 書き出しに対応した静的デモ。"
+      content="GitHub Pages で確認する、お絵かきチャットのコラボ描画プレビュー。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -14,76 +14,97 @@
     <div class="backdrop backdrop-a"></div>
     <div class="backdrop backdrop-b"></div>
 
-    <div class="app-shell">
+    <div class="app-shell collab-shell">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-mark">R</div>
+          <div class="brand-mark">OC</div>
           <div>
-            <p class="eyebrow">local photo workspace</p>
-            <h1>RapidRAW Studio</h1>
+            <p class="eyebrow">preview page</p>
+            <h1>Oekaki Chat Preview</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill" id="statusPill">No image loaded</span>
-          <span class="muted" id="imageMeta">Drag a file or open a photo</span>
+          <span class="status-pill" id="statusPill">Local canvas</span>
+          <span class="muted" id="imageMeta">Draw, add remote samples, and inspect the feed</span>
         </div>
 
         <div class="topbar-actions">
           <a class="button button-ghost" href="./index.html">Hub</a>
-          <label class="button button-ghost" for="fileInput">Open Image</label>
-          <button class="button button-ghost" id="resetButton" type="button">Reset</button>
-          <button class="button button-primary" id="exportButton" type="button">Export PNG</button>
-          <input id="fileInput" type="file" accept="image/*" hidden />
+          <button class="button button-ghost" id="addRemoteStrokeButton" type="button">Add Remote</button>
+          <button class="button button-ghost" id="clearStrokesButton" type="button">Clear</button>
         </div>
       </header>
 
-      <main class="workspace">
-        <aside class="panel panel-left">
+      <section class="card confirmation-banner">
+        <div class="confirmation-copy">
+          <p class="eyebrow">confirmation screen</p>
+          <h2>実際の確認用画面</h2>
+          <p>
+            ここが GitHub Pages 上で見るための確認用画面です。下のキャンバスで描画を試し、
+            右側のフィードで更新内容を確認できます。
+          </p>
+          <div class="confirmation-tags">
+            <span class="chip">local stroke</span>
+            <span class="chip">remote sample</span>
+            <span class="chip">stroke feed</span>
+          </div>
+        </div>
+
+        <div class="screen-mock" aria-hidden="true">
+          <div class="mock-topbar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="mock-stage">
+            <div class="mock-stroke mock-stroke-local"></div>
+            <div class="mock-stroke mock-stroke-remote"></div>
+            <div class="mock-chip mock-chip-a"></div>
+            <div class="mock-chip mock-chip-b"></div>
+          </div>
+          <div class="mock-footer">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </section>
+
+      <main class="collab-grid">
+        <aside class="panel collab-panel-left">
           <section class="card">
             <div class="card-head">
-              <h2>Library</h2>
-              <span class="chip">local</span>
+              <h2>Session</h2>
+              <span class="chip">Pages</span>
             </div>
             <p class="card-copy">
-              Load a photo, keep recent files, and export the current edit as a PNG.
+              これは Pages で確認するためのコラボ描画プレビューです。ここで書いた線はローカル保存されます。
             </p>
-            <div class="dropzone" id="dropzone">
-              <strong>Drop an image here</strong>
-              <span>or use the Open Image button</span>
-            </div>
+            <label class="field">
+              <span>User ID</span>
+              <input id="userIdInput" type="text" value="me" />
+            </label>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>Recent Files</h2>
-              <span class="chip" id="recentCount">0</span>
+              <h2>Stroke Stats</h2>
+              <span class="chip">live</span>
             </div>
-            <ul class="list" id="recentList"></ul>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Project Notes</h2>
-              <span class="chip">docs</span>
-            </div>
-            <p class="card-copy">
-              このリポジトリーは GitHub Pages 向けに `docs/` 配下へ集約しています。
-              将来的には RAW 取り込みやレイヤー編集を追加できます。
-            </p>
+            <dl class="status-grid" id="strokeStats"></dl>
           </section>
         </aside>
 
-        <section class="stage">
-          <div class="canvas-shell" id="canvasShell">
-            <canvas id="previewCanvas"></canvas>
-            <div class="empty-state" id="emptyState">
+        <section class="stage collab-stage">
+          <div class="canvas-shell collab-canvas-shell" id="canvasShell">
+            <canvas id="annotationCanvas"></canvas>
+            <div class="empty-state">
               <div class="empty-card">
-                <p class="eyebrow">photo editor</p>
-                <h2>Open a RAW or JPEG file to start</h2>
+                <p class="eyebrow">shared canvas</p>
+                <h2>Draw on the canvas</h2>
                 <p>
-                  The current build focuses on the editor shell, adjustment controls, preview
-                  rendering, and PNG export.
+                  左クリックやタップで線を描けます。Add Remote で相手の線の見本を足せます。
                 </p>
               </div>
             </div>
@@ -91,52 +112,32 @@
 
           <div class="filmstrip">
             <div class="filmstrip-item">
-              <span>Preview</span>
-              <strong>Canvas render</strong>
-            </div>
-            <div class="filmstrip-item">
-              <span>Export</span>
-              <strong>Full-size PNG</strong>
+              <span>Mode</span>
+              <strong>Shared canvas</strong>
             </div>
             <div class="filmstrip-item">
               <span>Storage</span>
-              <strong>Local presets</strong>
+              <strong>Local preview state</strong>
+            </div>
+            <div class="filmstrip-item">
+              <span>Feed</span>
+              <strong>Recent strokes</strong>
             </div>
           </div>
         </section>
 
-        <aside class="panel panel-right">
+        <aside class="panel collab-panel-right">
           <section class="card">
             <div class="card-head">
-              <h2>Develop</h2>
-              <span class="chip">filters</span>
+              <h2>Stroke Feed</h2>
+              <span class="chip">json</span>
             </div>
-            <div class="sliders" id="sliderGroup"></div>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Presets</h2>
-              <span class="chip">save</span>
-            </div>
-            <div class="preset-actions">
-              <button class="button button-ghost" id="savePresetButton" type="button">Save Current</button>
-              <button class="button button-ghost" id="demoPresetButton" type="button">Load Demo Look</button>
-            </div>
-            <ul class="list" id="presetList"></ul>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Status</h2>
-              <span class="chip" id="renderState">idle</span>
-            </div>
-            <dl class="status-grid" id="statusGrid"></dl>
+            <pre class="feed" id="strokeFeed"></pre>
           </section>
         </aside>
       </main>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./collab.js"></script>
   </body>
 </html>
