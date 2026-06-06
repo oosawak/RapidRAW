@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RapidRAW Studio</title>
+    <title>RapidRAW Hub</title>
     <meta
       name="description"
-      content="RapidRAW 風の写真編集スタジオ。ローカル画像の読み込み、調整、PNG 書き出しに対応した静的デモ。"
+      content="RapidRAW 本体と、今回のデモを切り替えて表示する入口ページ。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -14,128 +14,73 @@
     <div class="backdrop backdrop-a"></div>
     <div class="backdrop backdrop-b"></div>
 
-    <div class="app-shell">
+    <div class="app-shell hub-shell">
       <header class="topbar">
         <div class="brand">
           <div class="brand-mark">R</div>
           <div>
-            <p class="eyebrow">local photo workspace</p>
-            <h1>RapidRAW Studio</h1>
+            <p class="eyebrow">entry point</p>
+            <h1>RapidRAW Hub</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill" id="statusPill">No image loaded</span>
-          <span class="muted" id="imageMeta">Drag a file or open a photo</span>
+          <span class="status-pill" id="hubStatusPill">Two destinations</span>
+          <span class="muted" id="hubStatusText">RapidRAW 本体と、今回のデモを切り替えます</span>
         </div>
 
         <div class="topbar-actions">
-          <label class="button button-ghost" for="fileInput">Open Image</label>
-          <button class="button button-ghost" id="resetButton" type="button">Reset</button>
-          <button class="button button-primary" id="exportButton" type="button">Export PNG</button>
-          <input id="fileInput" type="file" accept="image/*" hidden />
+          <a class="button button-ghost" href="http://localhost:1420" target="_blank" rel="noreferrer">Open RapidRAW</a>
+          <a class="button button-primary" href="./demo.html">Open Demo</a>
         </div>
       </header>
 
-      <main class="workspace">
-        <aside class="panel panel-left">
-          <section class="card">
-            <div class="card-head">
-              <h2>Library</h2>
-              <span class="chip">local</span>
-            </div>
-            <p class="card-copy">
-              Load a photo, keep recent files, and export the current edit as a PNG.
-            </p>
-            <div class="dropzone" id="dropzone">
-              <strong>Drop an image here</strong>
-              <span>or use the Open Image button</span>
-            </div>
-          </section>
+      <main class="hub-grid">
+        <section class="card hub-intro">
+          <div class="card-head">
+            <h2>Choose a view</h2>
+            <span class="chip">landing</span>
+          </div>
+          <p class="card-copy">
+            まずはこの入口ページから、RapidRAW 本体と今回のデモを切り替えて見られます。
+            下のカードをクリックすると右側のプレビューが切り替わります。
+          </p>
 
-          <section class="card">
-            <div class="card-head">
-              <h2>Recent Files</h2>
-              <span class="chip" id="recentCount">0</span>
-            </div>
-            <ul class="list" id="recentList"></ul>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Project Notes</h2>
-              <span class="chip">docs</span>
-            </div>
-            <p class="card-copy">
-              このリポジトリーは GitHub Pages 向けに `docs/` 配下へ集約しています。
-              将来的には RAW 取り込みやレイヤー編集を追加できます。
-            </p>
-          </section>
-        </aside>
-
-        <section class="stage">
-          <div class="canvas-shell" id="canvasShell">
-            <canvas id="previewCanvas"></canvas>
-            <div class="empty-state" id="emptyState">
-              <div class="empty-card">
-                <p class="eyebrow">photo editor</p>
-                <h2>Open a RAW or JPEG file to start</h2>
-                <p>
-                  The current build focuses on the editor shell, adjustment controls, preview
-                  rendering, and PNG export.
-                </p>
-              </div>
-            </div>
+          <div class="hub-launches">
+            <button class="hub-launch-card is-active" type="button" data-preview-src="./demo.html" data-label="Demo" data-copy="今回の作成中デモ。ブラシ、表示、共通の見た目を確認するページです。">
+              <span class="hub-card-kicker">Preview</span>
+              <strong>今回のデモ</strong>
+              <span class="hub-card-copy">ブラシと UI を確認する静的デモ</span>
+            </button>
+            <button class="hub-launch-card" type="button" data-preview-src="http://localhost:1420" data-label="RapidRAW" data-copy="RapidRAW 本体です。ローカルで tauri dev / npm run dev を起動していると表示されます。">
+              <span class="hub-card-kicker">App</span>
+              <strong>RapidRAW 本体</strong>
+              <span class="hub-card-copy">実際のアプリ画面を表示</span>
+            </button>
           </div>
 
-          <div class="filmstrip">
-            <div class="filmstrip-item">
-              <span>Preview</span>
-              <strong>Canvas render</strong>
-            </div>
-            <div class="filmstrip-item">
-              <span>Export</span>
-              <strong>Full-size PNG</strong>
-            </div>
-            <div class="filmstrip-item">
-              <span>Storage</span>
-              <strong>Local presets</strong>
-            </div>
+          <div class="hub-note">
+            <strong>Note</strong>
+            <span id="hubNote">今回のデモを先に表示しています。右側のカードを押すと切り替わります。</span>
           </div>
         </section>
 
-        <aside class="panel panel-right">
-          <section class="card">
-            <div class="card-head">
-              <h2>Develop</h2>
-              <span class="chip">filters</span>
+        <section class="card hub-preview">
+          <div class="card-head">
+            <h2 id="previewTitle">Demo</h2>
+            <span class="chip" id="previewChip">./demo.html</span>
+          </div>
+          <div class="preview-frame-wrap">
+            <iframe id="previewFrame" title="RapidRAW preview" src="./demo.html"></iframe>
+            <div class="preview-fallback" id="previewFallback">
+              <strong>Preview target</strong>
+              <span>ラフな切替表示です。表示されない場合はボタンから別タブで開いてください。</span>
             </div>
-            <div class="sliders" id="sliderGroup"></div>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Presets</h2>
-              <span class="chip">save</span>
-            </div>
-            <div class="preset-actions">
-              <button class="button button-ghost" id="savePresetButton" type="button">Save Current</button>
-              <button class="button button-ghost" id="demoPresetButton" type="button">Load Demo Look</button>
-            </div>
-            <ul class="list" id="presetList"></ul>
-          </section>
-
-          <section class="card">
-            <div class="card-head">
-              <h2>Status</h2>
-              <span class="chip" id="renderState">idle</span>
-            </div>
-            <dl class="status-grid" id="statusGrid"></dl>
-          </section>
-        </aside>
+          </div>
+        </section>
       </main>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./hub.js"></script>
   </body>
 </html>

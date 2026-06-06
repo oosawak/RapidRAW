@@ -12,7 +12,7 @@
 
 ## 使い方
 
-`docs/index.html` をブラウザで開くか、GitHub Pages の公開先を `docs/` に設定してください。
+`docs/index.html` は入口ページです。ここから `docs/demo.html` のデモと、ローカルで起動した RapidRAW 本体を切り替えられます。GitHub Pages の公開先を `docs/` に設定してください。
 
 ## 次の拡張候補
 
