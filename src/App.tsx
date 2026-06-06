@@ -60,6 +60,7 @@ const RIGHT_PANEL_ORDER = [
   Panel.Metadata,
   Panel.Adjustments,
   Panel.Crop,
+  Panel.Collab,
   Panel.Masks,
   Panel.Ai,
   Panel.Presets,

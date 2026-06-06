@@ -7,6 +7,7 @@ import {
   Paintbrush,
   SwatchBook,
   FileInput,
+  MessageSquareMore,
   type LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +31,7 @@ const panelGroups: Array<Array<PanelOptions>> = [
   [
     { id: Panel.Adjustments, icon: SlidersHorizontal, title: 'editor.switcher.tooltips.adjust' },
     { id: Panel.Crop, icon: Crop, title: 'editor.switcher.tooltips.crop' },
+    { id: Panel.Collab, icon: MessageSquareMore, title: 'editor.switcher.tooltips.collab' },
     { id: Panel.Masks, icon: Layers, title: 'editor.switcher.tooltips.masks' },
     { id: Panel.Ai, icon: Paintbrush, title: 'editor.switcher.tooltips.inpaint' },
   ],

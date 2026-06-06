@@ -12,6 +12,7 @@ import MetadataPanel from '../panel/right/MetadataPanel';
 import CropPanel from '../panel/right/CropPanel';
 import MasksPanel from '../panel/right/MasksPanel';
 import AIPanel from '../panel/right/AIPanel';
+import CollabPanel from '../panel/right/CollabPanel';
 import PresetsPanel from '../panel/right/PresetsPanel';
 import ExportPanel from '../panel/right/ExportPanel';
 
@@ -216,6 +217,7 @@ export default function EditorView({
           {renderedRightPanel === Panel.Adjustments && <Controls />}
           {renderedRightPanel === Panel.Metadata && <MetadataPanel />}
           {renderedRightPanel === Panel.Crop && <CropPanel />}
+          {renderedRightPanel === Panel.Collab && <CollabPanel />}
           {renderedRightPanel === Panel.Masks && <MasksPanel />}
           {renderedRightPanel === Panel.Presets && (
             <PresetsPanel

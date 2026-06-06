@@ -121,6 +121,7 @@ export enum Panel {
   Ai = 'ai',
   Crop = 'crop',
   Export = 'export',
+  Collab = 'collab',
   Masks = 'masks',
   Metadata = 'metadata',
   Presets = 'presets',
