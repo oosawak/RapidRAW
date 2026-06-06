@@ -6,7 +6,7 @@
     <title>Oekaki Chat Pages</title>
     <meta
       name="description"
-      content="GitHub Pages 上で確認する、お絵かきチャットとコラボ描画の入口ページ。"
+      content="GitHub Pages 上で確認する、お絵かきチャットと RapidRAW の入口ページ。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -20,55 +20,60 @@
           <div class="brand-mark">OC</div>
           <div>
             <p class="eyebrow">GitHub Pages</p>
-            <h1>Oekaki Chat Hub</h1>
+            <h1>Preview Hub</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill">Preview portal</span>
-          <span class="muted">今作っているものを Pages 上で確認する入口です</span>
+          <span class="status-pill">Two previews</span>
+          <span class="muted">demo と RapidRAW の両方をここから確認します</span>
         </div>
 
         <div class="topbar-actions">
-          <a class="button button-primary" href="./demo.html">Open Preview</a>
+          <a class="button button-primary" href="./demo.html">Open Demo</a>
         </div>
       </header>
 
       <main class="hub-grid">
         <section class="card hub-intro">
           <div class="card-head">
-            <h2>What you can see here</h2>
+            <h2>Choose a view</h2>
             <span class="chip">Pages only</span>
           </div>
           <p class="card-copy">
-            ここは GitHub Pages 用の入口です。クリックすると、今作っているコラボ描画の
-            プレビューに移動します。ローカルホストは使いません。
+            ここから、今作っている確認用画面と RapidRAW 風のプレビューを切り替えられます。
+            どちらも GitHub Pages で見られるようにしています。
           </p>
 
           <div class="hub-launches">
-            <a class="hub-launch-card is-active" href="./demo.html">
+            <button class="hub-launch-card is-active" type="button" data-preview-src="./demo.html" data-label="Demo" data-copy="コラボ描画の確認用画面。キャンバスとストロークフィードを見られます。">
               <span class="hub-card-kicker">Preview</span>
-              <strong>Oekaki Chat Preview</strong>
-              <span class="hub-card-copy">共有ストロークの見た目と操作感を確認するページ</span>
-            </a>
+              <strong>Demo</strong>
+              <span class="hub-card-copy">確認用画面を開く</span>
+            </button>
+            <button class="hub-launch-card" type="button" data-preview-src="./rapidraw.html" data-label="RapidRAW" data-copy="RapidRAW 風の写真編集プレビュー。調整 UI と PNG 書き出しを確認できます。">
+              <span class="hub-card-kicker">Preview</span>
+              <strong>RapidRAW</strong>
+              <span class="hub-card-copy">写真編集の見た目を開く</span>
+            </button>
           </div>
 
           <div class="hub-note">
             <strong>Note</strong>
-            <span>まずはこのページからデモを開いてください。</span>
+            <span id="hubNote">最初は Demo を表示しています。右のプレビュー枠で切り替わります。</span>
           </div>
         </section>
 
         <section class="card hub-preview">
           <div class="card-head">
-            <h2>Live preview</h2>
-            <span class="chip">./demo.html</span>
+            <h2 id="previewTitle">Demo</h2>
+            <span class="chip" id="previewChip">./demo.html</span>
           </div>
           <div class="preview-frame-wrap">
-            <iframe id="previewFrame" title="Oekaki Chat preview" src="./demo.html"></iframe>
+            <iframe id="previewFrame" title="Preview" src="./demo.html"></iframe>
             <div class="preview-fallback" id="previewFallback">
               <strong>Preview target</strong>
-              <span>表示されない場合は Open Preview を押してください。</span>
+              <span>表示されない場合はボタンから別タブで開いてください。</span>
             </div>
           </div>
         </section>

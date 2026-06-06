@@ -6,11 +6,13 @@
 
 - `docs/index.html` は入口ページです
 - `docs/demo.html` は今作っているコラボ描画の確認用画面です
+- `docs/rapidraw.html` は RapidRAW 風の確認用画面です
 - GitHub Pages の公開先を `docs/` に設定してください
 
 ## できること
 
 - コラボ描画の確認用画面
+- RapidRAW 風の確認用画面
 - ローカルで描いたストロークの保存
 - 相手側ストロークのサンプル追加
 - フィードの確認

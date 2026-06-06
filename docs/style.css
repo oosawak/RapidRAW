@@ -497,7 +497,7 @@ body::before {
 
 
 .hub-shell {
-  max-width: 1400px;
+  max-width: 1640px;
 }
 
 .hub-grid {
@@ -874,4 +874,10 @@ body::before {
   .confirmation-banner {
     grid-template-columns: 1fr;
   }
+}
+
+
+.preview-card {
+  display: grid;
+  gap: 8px;
 }
