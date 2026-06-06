@@ -1,3 +1,6 @@
+let wasmProcessor = null;
+let wasmProcessorPromise = null;
+
 const STORAGE_KEY = "rapidraw-studio-strokes";
 
 const strokesState = {
@@ -7,7 +10,15 @@ const strokesState = {
   seq: 0,
 };
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
+  try {
+    await loadWasmProcessor();
+  } catch (error) {
+    console.error("Failed to initialize WASM processor", error);
+    document.body.dataset.wasmError = error instanceof Error ? error.message : String(error);
+    return;
+  }
+
   const canvas = document.getElementById("annotationCanvas");
   const shell = document.getElementById("canvasShell");
   const userIdInput = document.getElementById("userIdInput");
@@ -171,6 +182,18 @@ function pointerToPoint(event, canvas) {
   };
 }
 
+async function loadWasmProcessor() {
+  if (!wasmProcessorPromise) {
+    wasmProcessorPromise = import("./wasm/bridge.js")
+      .then((mod) => mod.createProcessor())
+      .then((processor) => {
+        wasmProcessor = processor;
+        return processor;
+      });
+  }
+  return wasmProcessorPromise;
+}
+
 function renderOverlay(context, width, height) {
   context.clearRect(0, 0, width, height);
   const strokes = [...strokesState.strokes];
@@ -183,7 +206,7 @@ function renderOverlay(context, width, height) {
 }
 
 function drawStroke(context, stroke) {
-  const points = stroke.points || [];
+  const points = getRenderablePoints(stroke.points || []);
   if (points.length < 2) {
     return;
   }
@@ -200,6 +223,13 @@ function drawStroke(context, stroke) {
   }
   context.stroke();
   context.restore();
+}
+
+function getRenderablePoints(points) {
+  if (!wasmProcessor || typeof wasmProcessor.interpolateStroke !== "function") {
+    throw new Error("WASM processor is not ready");
+  }
+  return wasmProcessor.interpolateStroke(points, 6);
 }
 
 function renderStats(target) {

@@ -110,3 +110,38 @@ fn pseudo_noise(x: u32, y: u32, grain_strength: f32) -> f32 {
     (normalized - 0.5) * 36.0 * grain_strength
 }
 
+#[wasm_bindgen]
+pub fn interpolate_stroke(points: Vec<f32>, spacing: f32) -> Vec<f32> {
+    let mut output = Vec::new();
+    if points.len() < 4 {
+        return output;
+    }
+
+    let spacing = spacing.max(0.25);
+    let mut last_point: Option<(f32, f32)> = None;
+
+    for chunk in points.chunks_exact(2) {
+        let current = (chunk[0], chunk[1]);
+        if let Some(prev) = last_point {
+            let dx = current.0 - prev.0;
+            let dy = current.1 - prev.1;
+            let distance = (dx * dx + dy * dy).sqrt();
+            let steps = (distance / spacing).ceil().max(1.0) as usize;
+
+            for step in 1..=steps {
+                let t = step as f32 / steps as f32;
+                let x = prev.0 + dx * t;
+                let y = prev.1 + dy * t;
+                output.push(x);
+                output.push(y);
+            }
+        } else {
+            output.push(current.0);
+            output.push(current.1);
+        }
+        last_point = Some(current);
+    }
+
+    output
+}
+

@@ -1,0 +1,15 @@
+{
+  "name": "rapidraw_wasm",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "rapidraw_wasm_bg.wasm",
+    "rapidraw_wasm.js",
+    "rapidraw_wasm.d.ts"
+  ],
+  "main": "rapidraw_wasm.js",
+  "types": "rapidraw_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
