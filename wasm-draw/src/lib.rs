@@ -121,7 +121,8 @@ pub fn rasterize_stroke_rgba(
         alpha,
     );
 
-    let pixels = js_sys::Uint8Array::from(buffer.as_slice());
+    let pixels = js_sys::Uint8Array::new_with_length(pixel_count as u32);
+    pixels.copy_from(&buffer);
     std::mem::forget(buffer);
     pixels
 }

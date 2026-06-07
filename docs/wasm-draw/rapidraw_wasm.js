@@ -165,11 +165,6 @@ function __wbg_get_imports() {
             const ret = new Uint8Array(arg0 >>> 0);
             return ret;
         },
-        __wbg_new_from_slice_18fa1f71286d66b8: function(arg0, arg1) {
-            const start = arg0 >>> 0;
-            const len = arg1 >>> 0;
-            return new Uint8Array(getUint8ArrayMemory0().subarray(start, start + len));
-        },
         __wbg_stack_3b0d974bbf31e44f: function(arg0, arg1) {
             const ret = arg1 && typeof arg1.stack === 'string' ? arg1.stack : '';
             const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -407,7 +402,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (module_or_path === undefined) {
-        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=e1a7b2c9', import.meta.url);
+        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=a4c1d2e7', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
