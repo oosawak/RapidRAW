@@ -6,7 +6,7 @@
     <title>WASM Drawing</title>
     <meta
       name="description"
-      content="これから作る WASM 描画ページの入口です。WASM でピクセルを描く実装をここに載せます。"
+      content="WASM で直接描画する確認ページです。線のラスタライズを Rust 側で行います。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -19,48 +19,107 @@
         <div class="brand">
           <div class="brand-mark">WD</div>
           <div>
-            <p class="eyebrow">work in progress</p>
+            <p class="eyebrow">wasm draw</p>
             <h1>WASM Drawing</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill">Planned screen</span>
-          <span class="muted">WASM で直接描画する画面をここに作ります</span>
+          <span class="status-pill" id="statusPill">WASM loading</span>
+          <span class="muted" id="drawMeta">Rust 側で線をラスタライズして Canvas に表示します</span>
         </div>
 
         <div class="topbar-actions">
           <a class="button button-ghost" href="./index.html">Hub</a>
           <a class="button button-ghost" href="./wasm-lab.html">WASM Lab</a>
-          <a class="button button-ghost" href="./rapidraw.html">RapidRAW</a>
         </div>
       </header>
 
-      <main class="hub-grid hub-grid-single">
-        <section class="card hub-intro">
-          <div class="card-head">
-            <h2>Planned WASM Drawing</h2>
-            <span class="chip">soon</span>
-          </div>
-          <p class="card-copy">
-            このページは、これから作る WASM 直描画の確認画面です。
-            今は入口だけ用意してあり、WASM でピクセルを直接描く実装をここに載せる予定です。
-          </p>
+      <main class="workspace">
+        <aside class="panel panel-left">
+          <section class="card">
+            <div class="card-head">
+              <h2>Brush</h2>
+              <span class="chip">wasm</span>
+            </div>
+            <p class="card-copy">
+              色や太さを変えると、WASM 側のラスタライズ結果に反映されます。
+            </p>
+            <label class="field">
+              <span>Brush Size</span>
+              <input id="brushSizeInput" type="range" min="1" max="28" step="1" value="8" />
+            </label>
+            <label class="field">
+              <span>Brush Color</span>
+              <input id="brushColorInput" type="color" value="#f08c46" />
+            </label>
+            <div class="preset-actions">
+              <button class="button button-ghost" id="undoButton" type="button">Undo</button>
+              <button class="button button-ghost" id="clearButton" type="button">Clear</button>
+            </div>
+          </section>
 
-          <div class="hub-launches">
-            <a class="hub-launch-card is-active" href="./wasm-draw.html" target="_blank" rel="noreferrer">
-              <span class="hub-card-kicker">Preview</span>
-              <strong>WASM Drawing</strong>
-              <span class="hub-card-copy">将来の描画ページの入口</span>
-            </a>
+          <section class="card">
+            <div class="card-head">
+              <h2>Status</h2>
+              <span class="chip">live</span>
+            </div>
+            <dl class="status-grid" id="statusGrid"></dl>
+          </section>
+        </aside>
+
+        <section class="stage">
+          <div class="canvas-shell collab-canvas-shell" id="canvasShell">
+            <canvas id="annotationCanvas"></canvas>
+            <div class="empty-state">
+              <div class="empty-card">
+                <p class="eyebrow">wasm raster</p>
+                <h2>Draw here</h2>
+                <p>
+                  線の描画は Rust 側でラスタライズしてから Canvas に載せています。
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div class="hub-note">
-            <strong>Note</strong>
-            <span>WASM 直描画の実装はこれから追加します。</span>
+          <div class="filmstrip">
+            <div class="filmstrip-item">
+              <span>Mode</span>
+              <strong>WASM draw</strong>
+            </div>
+            <div class="filmstrip-item">
+              <span>Backend</span>
+              <strong>Rust raster</strong>
+            </div>
+            <div class="filmstrip-item">
+              <span>FPS</span>
+              <strong id="fpsValue">0</strong>
+            </div>
+            <div class="filmstrip-item">
+              <span>Brush</span>
+              <strong id="brushSummary">8px / #f08c46</strong>
+            </div>
           </div>
         </section>
+
+        <aside class="panel panel-right">
+          <section class="card">
+            <div class="card-head">
+              <h2>Notes</h2>
+              <span class="chip">docs</span>
+            </div>
+            <p class="card-copy">
+              このページは Canvas 版とは別の確認用画面です。WASM の描画処理を単体で見ます。
+            </p>
+            <div class="hub-note">
+              <strong>Tip</strong>
+              <span>ブラシの色と太さを変えて、WASM で反映されるかを確認します。</span>
+            </div>
+          </section>
+        </aside>
       </main>
     </div>
+
+    <script src="./wasm-draw.js"></script>
   </body>
 </html>

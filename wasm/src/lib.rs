@@ -139,6 +139,20 @@ pub fn prepare_stroke(points: Vec<f32>, spacing: f32, color: String, size: f32) 
 pub fn interpolate_stroke(points: Vec<f32>, spacing: f32) -> Vec<f32> {
     interpolate_points(points, spacing.max(0.25))
 }
+#[wasm_bindgen]
+pub fn rasterize_stroke_rgba(
+    width: u32,
+    height: u32,
+    points: Vec<f32>,
+    spacing: f32,
+    color: String,
+    size: f32,
+    opacity: f32,
+) -> Vec<u8> {
+    let plan = prepare_stroke(points, spacing, color, size);
+    rasterize_points(&plan.points, width, height, &plan.color, plan.size, opacity)
+}
+
 
 fn interpolate_points(points: Vec<f32>, spacing: f32) -> Vec<f32> {
     let mut output = Vec::new();
@@ -171,6 +185,208 @@ fn interpolate_points(points: Vec<f32>, spacing: f32) -> Vec<f32> {
     }
 
     output
+}
+
+fn rasterize_points(
+    points: &[f32],
+    width: u32,
+    height: u32,
+    color: &str,
+    size: f32,
+    opacity: f32,
+) -> Vec<u8> {
+    let mut output = vec![0u8; width.saturating_mul(height) as usize * 4];
+    if width == 0 || height == 0 || points.len() < 2 {
+        return output;
+    }
+
+    let (red, green, blue) = parse_hex_rgb(color).unwrap_or((240, 140, 70));
+    let opacity = opacity.clamp(0.0, 1.0);
+    let radius = size.clamp(1.0, 64.0) * 0.5;
+    let padding = radius + 1.5;
+
+    let mut last_point: Option<(f32, f32)> = None;
+    for chunk in points.chunks_exact(2) {
+        let current = (chunk[0], chunk[1]);
+        draw_circle(
+            &mut output,
+            width,
+            height,
+            current,
+            radius,
+            red,
+            green,
+            blue,
+            opacity,
+        );
+
+        if let Some(previous) = last_point {
+            draw_segment(
+                &mut output,
+                width,
+                height,
+                previous,
+                current,
+                radius,
+                red,
+                green,
+                blue,
+                opacity,
+                padding,
+            );
+        }
+        last_point = Some(current);
+    }
+
+    output
+}
+
+fn draw_segment(
+    output: &mut [u8],
+    width: u32,
+    height: u32,
+    start: (f32, f32),
+    end: (f32, f32),
+    radius: f32,
+    red: u8,
+    green: u8,
+    blue: u8,
+    opacity: f32,
+    padding: f32,
+) {
+    let min_x = ((start.0.min(end.0) - padding).floor().max(0.0)) as u32;
+    let min_y = ((start.1.min(end.1) - padding).floor().max(0.0)) as u32;
+    let max_x = ((start.0.max(end.0) + padding).ceil().min(width.saturating_sub(1) as f32)) as u32;
+    let max_y = ((start.1.max(end.1) + padding).ceil().min(height.saturating_sub(1) as f32)) as u32;
+
+    if min_x > max_x || min_y > max_y {
+        return;
+    }
+
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dist = distance_to_segment(x as f32 + 0.5, y as f32 + 0.5, start, end);
+            let coverage = coverage_for_distance(dist, radius);
+            if coverage <= 0.0 {
+                continue;
+            }
+            let alpha = (coverage * opacity * 255.0).round().clamp(0.0, 255.0) as u8;
+            blend_pixel(output, width, x, y, red, green, blue, alpha);
+        }
+    }
+}
+
+fn draw_circle(
+    output: &mut [u8],
+    width: u32,
+    height: u32,
+    center: (f32, f32),
+    radius: f32,
+    red: u8,
+    green: u8,
+    blue: u8,
+    opacity: f32,
+) {
+    let padding = radius + 1.5;
+    let min_x = ((center.0 - padding).floor().max(0.0)) as u32;
+    let min_y = ((center.1 - padding).floor().max(0.0)) as u32;
+    let max_x = ((center.0 + padding).ceil().min(width.saturating_sub(1) as f32)) as u32;
+    let max_y = ((center.1 + padding).ceil().min(height.saturating_sub(1) as f32)) as u32;
+
+    if min_x > max_x || min_y > max_y {
+        return;
+    }
+
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let dx = x as f32 + 0.5 - center.0;
+            let dy = y as f32 + 0.5 - center.1;
+            let dist = (dx * dx + dy * dy).sqrt();
+            let coverage = coverage_for_distance(dist, radius);
+            if coverage <= 0.0 {
+                continue;
+            }
+            let alpha = (coverage * opacity * 255.0).round().clamp(0.0, 255.0) as u8;
+            blend_pixel(output, width, x, y, red, green, blue, alpha);
+        }
+    }
+}
+
+fn blend_pixel(output: &mut [u8], width: u32, x: u32, y: u32, red: u8, green: u8, blue: u8, alpha: u8) {
+    let index = ((y * width + x) * 4) as usize;
+    if index + 3 >= output.len() || alpha == 0 {
+        return;
+    }
+
+    let dst_a = output[index + 3] as f32 / 255.0;
+    let src_a = alpha as f32 / 255.0;
+    let out_a = src_a + dst_a * (1.0 - src_a);
+    if out_a <= f32::EPSILON {
+        return;
+    }
+
+    let dst_r = output[index] as f32;
+    let dst_g = output[index + 1] as f32;
+    let dst_b = output[index + 2] as f32;
+    let src_r = red as f32;
+    let src_g = green as f32;
+    let src_b = blue as f32;
+
+    output[index] = ((src_r * src_a + dst_r * dst_a * (1.0 - src_a)) / out_a).round().clamp(0.0, 255.0) as u8;
+    output[index + 1] = ((src_g * src_a + dst_g * dst_a * (1.0 - src_a)) / out_a).round().clamp(0.0, 255.0) as u8;
+    output[index + 2] = ((src_b * src_a + dst_b * dst_a * (1.0 - src_a)) / out_a).round().clamp(0.0, 255.0) as u8;
+    output[index + 3] = (out_a * 255.0).round().clamp(0.0, 255.0) as u8;
+}
+
+fn coverage_for_distance(distance: f32, radius: f32) -> f32 {
+    let inner = (radius - 0.75).max(0.0);
+    let outer = radius + 0.75;
+    if distance <= inner {
+        return 1.0;
+    }
+    if distance >= outer {
+        return 0.0;
+    }
+    1.0 - smoothstep(inner, outer, distance)
+}
+
+fn smoothstep(edge0: f32, edge1: f32, x: f32) -> f32 {
+    if (edge1 - edge0).abs() <= f32::EPSILON {
+        return if x < edge0 { 0.0 } else { 1.0 };
+    }
+    let t = ((x - edge0) / (edge1 - edge0)).clamp(0.0, 1.0);
+    t * t * (3.0 - 2.0 * t)
+}
+
+fn distance_to_segment(px: f32, py: f32, start: (f32, f32), end: (f32, f32)) -> f32 {
+    let vx = end.0 - start.0;
+    let vy = end.1 - start.1;
+    let length_sq = vx * vx + vy * vy;
+    if length_sq <= f32::EPSILON {
+        let dx = px - start.0;
+        let dy = py - start.1;
+        return (dx * dx + dy * dy).sqrt();
+    }
+
+    let t = (((px - start.0) * vx) + ((py - start.1) * vy)) / length_sq;
+    let t = t.clamp(0.0, 1.0);
+    let proj_x = start.0 + vx * t;
+    let proj_y = start.1 + vy * t;
+    let dx = px - proj_x;
+    let dy = py - proj_y;
+    (dx * dx + dy * dy).sqrt()
+}
+
+fn parse_hex_rgb(color: &str) -> Option<(u8, u8, u8)> {
+    let hex = color.strip_prefix('#')?;
+    if hex.len() != 6 {
+        return None;
+    }
+
+    let red = u8::from_str_radix(&hex[0..2], 16).ok()?;
+    let green = u8::from_str_radix(&hex[2..4], 16).ok()?;
+    let blue = u8::from_str_radix(&hex[4..6], 16).ok()?;
+    Some((red, green, blue))
 }
 
 fn normalize_color(color: &str) -> String {

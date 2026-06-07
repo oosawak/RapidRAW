@@ -15,6 +15,7 @@ export function grade_rgba(input: Uint8Array, width: number, height: number, exp
 export function interpolate_stroke(points: Float32Array, spacing: number): Float32Array;
 
 export function prepare_stroke(points: Float32Array, spacing: number, color: string, size: number): StrokePlan;
+export function rasterize_stroke_rgba(width: number, height: number, points: Float32Array, spacing: number, color: string, size: number, opacity: number): Uint8Array;
 
 export function processor_name(): string;
 

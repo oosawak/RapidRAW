@@ -104,6 +104,27 @@ export function prepare_stroke(points, spacing, color, size) {
 }
 
 /**
+ * @param {number} width
+ * @param {number} height
+ * @param {Float32Array} points
+ * @param {number} spacing
+ * @param {string} color
+ * @param {number} size
+ * @param {number} opacity
+ * @returns {Uint8Array}
+ */
+export function rasterize_stroke_rgba(width, height, points, spacing, color, size, opacity) {
+    const ptr0 = passArrayF32ToWasm0(points, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.rasterize_stroke_rgba(width, height, ptr0, len0, spacing, ptr1, len1, size, opacity);
+    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v2;
+}
+
+/**
  * @returns {string}
  */
 export function processor_name() {
