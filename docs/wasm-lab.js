@@ -164,14 +164,13 @@ window.addEventListener('load', async () => {
       return;
     }
     strokesState.pointerDown = false;
-    const stroke = strokesState.activeStroke;
-    if (stroke) {
-      appendPoint(stroke, pointerToPoint(event, canvas));
-      strokesState.activeStroke = null;
-      commitActiveStroke(stroke);
-      updateCanvasState();
-      persist();
-      render();
+    if (strokesState.activeStroke) {
+      appendPoint(strokesState.activeStroke, pointerToPoint(event, canvas));
+      awaitCommitActiveStroke().then(() => {
+        updateCanvasState();
+        persist();
+        render();
+      });
       return;
     }
     updateCanvasState();
@@ -186,7 +185,7 @@ window.addEventListener('load', async () => {
     render();
   };
 
-  const addRemoteSampleStroke = () => {
+  const addRemoteSampleStroke = async () => {
     const width = shell.clientWidth;
     const height = shell.clientHeight;
     const now = Date.now();
@@ -200,7 +199,7 @@ window.addEventListener('load', async () => {
       { x: width * 0.84, y: height * 0.40, t: now + 64 },
     ];
     stroke.inputPoints = stroke.points.slice();
-    stroke.rendered = prepareRenderableStroke(stroke, 6);
+    stroke.rendered = await prepareRenderableStroke(stroke, 6);
     stroke.points = stroke.rendered.points;
     stroke.color = stroke.rendered.color;
     stroke.size = stroke.rendered.size;
@@ -238,22 +237,27 @@ window.addEventListener('load', async () => {
   render();
   startFrameLoop();
 
-  function commitActiveStroke(stroke) {
-    const rendered = prepareRenderableStroke(stroke, Math.max(4, Math.round(drawSettings.size * 0.75)));
+  async function awaitCommitActiveStroke() {
+    const stroke = strokesState.activeStroke;
+    if (!stroke) {
+      return;
+    }
+    const rendered = await prepareRenderableStroke(stroke, Math.max(4, Math.round(drawSettings.size * 0.75)));
     stroke.rendered = rendered;
     stroke.color = rendered.color;
     stroke.size = rendered.size;
     stroke.points = rendered.points;
     strokesState.strokes = clampStrokes([...strokesState.strokes, stroke]);
+    strokesState.activeStroke = null;
   }
 
-  function prepareRenderableStroke(stroke, spacing) {
+  async function prepareRenderableStroke(stroke, spacing) {
     const brush = {
       color: stroke.inputColor || stroke.color || drawSettings.color,
       size: stroke.inputSize || stroke.size || drawSettings.size,
     };
     const points = stroke.points.map((point) => ({ x: point.x, y: point.y }));
-    const prepared = wasmProcessor.prepareStroke(points, brush, spacing);
+    const prepared = await Promise.resolve(wasmProcessor.prepareStroke(points, brush, spacing));
     return {
       points: prepared.points,
       color: prepared.color,

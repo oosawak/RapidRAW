@@ -50,28 +50,16 @@ function createWasmProcessor(mod) {
     },
     prepareStroke(points, brush, spacing = 6) {
       const flatInput = flattenPoints(points);
-      const output = mod.interpolate_stroke(flatInput, spacing);
-      return {
-        points: unflattenPoints(output),
-        color: brush?.color ?? "#f08c46",
-        size: brush?.size ?? 8,
-      };
-    },
-    rasterizeStroke(points, brush, width, height, spacing = 6, opacity = 1) {
-      const flatInput = flattenPoints(points);
-      const output = mod.rasterize_stroke_rgba(
-        width,
-        height,
+      const output = mod.prepare_stroke(
         flatInput,
         spacing,
         brush?.color ?? "#f08c46",
         brush?.size ?? 8,
-        opacity,
       );
       return {
-        width,
-        height,
-        pixels: output,
+        points: unflattenPoints(output.points),
+        color: output.color,
+        size: output.size,
       };
     },
   };

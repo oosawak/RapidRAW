@@ -104,27 +104,6 @@ export function prepare_stroke(points, spacing, color, size) {
 }
 
 /**
- * @param {number} width
- * @param {number} height
- * @param {Float32Array} points
- * @param {number} spacing
- * @param {string} color
- * @param {number} size
- * @param {number} opacity
- * @returns {Uint8Array}
- */
-export function rasterize_stroke_rgba(width, height, points, spacing, color, size, opacity) {
-    const ptr0 = passArrayF32ToWasm0(points, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.rasterize_stroke_rgba(width, height, ptr0, len0, spacing, ptr1, len1, size, opacity);
-    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-    return v2;
-}
-
-/**
  * @returns {string}
  */
 export function processor_name() {
@@ -145,7 +124,7 @@ export function start() {
 }
 function __wbg_get_imports() {
     const import0 = {
-        __wbindgen_describe: function() {},
+        __proto__: null,
         __wbg___wbindgen_throw_1506f2235d1bdba0: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
@@ -171,7 +150,6 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
-        __wbindgen_object_drop_ref: function() {},
         __wbindgen_init_externref_table: function() {
             const table = wasm.__wbindgen_externrefs;
             const offset = table.grow(4);
@@ -182,16 +160,9 @@ function __wbg_get_imports() {
             table.set(offset + 3, false);
         },
     };
-    const import1 = {
-        __wbindgen_externref_table_grow: function(delta) {
-            return delta;
-        },
-        __wbindgen_externref_table_set_null: function() {},
-    };
     return {
+        __proto__: null,
         "./rapidraw_wasm_bg.js": import0,
-        "__wbindgen_placeholder__": import0,
-        "__wbindgen_externref_xform__": import1,
     };
 }
 
@@ -325,11 +296,7 @@ function __wbg_finalize_init(instance, module) {
     cachedDataViewMemory0 = null;
     cachedFloat32ArrayMemory0 = null;
     cachedUint8ArrayMemory0 = null;
-    if (typeof wasm.__wbindgen_start === "function") {
-        wasm.__wbindgen_start();
-    } else if (typeof wasm.start === "function") {
-        wasm.start();
-    }
+    wasm.__wbindgen_start();
     return wasm;
 }
 
