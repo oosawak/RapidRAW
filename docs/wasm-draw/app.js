@@ -206,16 +206,21 @@ window.addEventListener('load', async () => {
     if (!wasmProcessor || typeof wasmProcessor.rasterizeStroke !== 'function') {
       return null;
     }
-    const key = `${width}x${height}:${stroke.color}:${stroke.size}:${stroke.points.length}`;
+    if (!stroke || !Array.isArray(stroke.points) || stroke.points.length < 2) {
+      return null;
+    }
+    const brushColor = typeof stroke.color === 'string' && stroke.color.length > 0 ? stroke.color : state.brush.color;
+    const brushSize = Number.isFinite(stroke.size) ? stroke.size : state.brush.size;
+    const key = `${width}x${height}:${brushColor}:${brushSize}:${stroke.points.length}`;
     if (stroke.raster && stroke.raster.key === key) {
       return stroke.raster.imageData;
     }
     const raster = wasmProcessor.rasterizeStroke(
       stroke.points,
-      { color: stroke.color, size: stroke.size },
+      { color: brushColor, size: brushSize },
       width,
       height,
-      Math.max(4, Math.round(stroke.size * 0.75)),
+      Math.max(4, Math.round(brushSize * 0.75)),
       stroke === state.activeStroke ? 1 : 0.95,
     );
     const imageData = new ImageData(new Uint8ClampedArray(raster.pixels), raster.width, raster.height);
