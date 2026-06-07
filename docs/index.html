@@ -39,13 +39,13 @@
       <main class="hub-grid hub-grid-single">
         <section class="card hub-intro">
           <div class="card-head">
-            <h2>Project Overview</h2>
+            <h2>What this project is building</h2>
             <span class="chip">docs</span>
           </div>
           <p class="card-copy">
-            このプロジェクトは `docs/index.html` を入口にし、`WASM Lab`、`WASM Drawing`、`RapidRAW` を別ページとして開く構成です。<br />
-            `docs/wasm-lab.html` は WASM で整形した点列を Canvas に描く採用版の画面、`docs/wasm-draw.html` はこれから作る WASM 描画の確認ページ、`docs/rapidraw.html` は RapidRAW 風の確認用画面です。<br />
-            描画の中身は `WASM` で処理し、ページの説明や導線は `docs/` 側で管理します。
+            このプロジェクトは、RapidRAW をベースにお絵かきチャット / コラボ描画を作る試作です。<br />
+            自分が描く入力は `WASM` で補間や平滑化を行い、相手の描画は `Canvas` で表示する、という役割分担を前提にしています。<br />
+            さらに、将来的には `WebSocket` で線の送受信をつなぎ、`Discord` 連携も見据えています。
           </p>
 
           <div class="hub-launches">
@@ -78,15 +78,15 @@
             </li>
             <li>
               <strong>WASM Lab</strong>
-              <span>採用版の Canvas 描画画面</span>
+              <span>WASM で描画入力を整える画面</span>
             </li>
             <li>
               <strong>WASM Drawing</strong>
-              <span>これから作る WASM 描画ページ</span>
+              <span>WASM 直描画の計画ページ</span>
             </li>
             <li>
               <strong>RapidRAW</strong>
-              <span>写真編集プレビュー</span>
+              <span>RapidRAW ベースの編集プレビュー</span>
             </li>
           </ul>
         </section>
