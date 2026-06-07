@@ -73,6 +73,7 @@ window.addEventListener('load', async () => {
       }
     }
     syncBrushUi();
+    fpsValue.textContent = String(state.fpsValue);
     render();
   });
 
@@ -187,11 +188,13 @@ window.addEventListener('load', async () => {
     }
 
     shell.classList.toggle('has-drawn', state.strokes.length > 0 || Boolean(state.activeStroke));
+    fpsValue.textContent = String(state.fpsValue);
     statusGrid.innerHTML = [
       ['Strokes', String(state.strokes.length)],
       ['Active', state.activeStroke ? 'yes' : 'no'],
       ['Brush', `${state.brush.size}px`],
       ['Color', state.brush.color],
+      ['FPS', String(state.fpsValue)],
       ['WASM', wasmProcessor?.kind || 'loading'],
       ['Scale', String(state.renderScale.toFixed(2))],
     ].map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('');
