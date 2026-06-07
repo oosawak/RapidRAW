@@ -11,6 +11,9 @@ const state = {
   lastFpsTick: performance.now(),
   frameCount: 0,
   renderScale: 1,
+  lastPointerType: 'none',
+  lastPointerMeta: 'pointer events waiting',
+  pointerLog: '-',
 };
 
 window.addEventListener('load', async () => {
@@ -25,8 +28,12 @@ window.addEventListener('load', async () => {
   const fpsValue = document.getElementById('fpsValue');
   const drawMeta = document.getElementById('drawMeta');
   const brushSummary = document.getElementById('brushSummary');
+  const pointerState = document.getElementById('pointerState');
+  const pointerType = document.getElementById('pointerType');
+  const pointerMeta = document.getElementById('pointerMeta');
+  const pointerLog = document.getElementById('pointerLog');
 
-  if (!canvas || !shell || !brushSizeInput || !brushColorInput || !undoButton || !clearButton || !statusPill || !statusGrid || !fpsValue || !drawMeta || !brushSummary) {
+  if (!canvas || !shell || !brushSizeInput || !brushColorInput || !undoButton || !clearButton || !statusPill || !statusGrid || !fpsValue || !drawMeta || !brushSummary || !pointerState || !pointerType || !pointerMeta || !pointerLog) {
     return;
   }
 
@@ -52,6 +59,7 @@ window.addEventListener('load', async () => {
   }
 
   canvas.style.touchAction = 'none';
+  canvas.style.pointerEvents = 'auto';
   state.strokes = [];
   syncBrushUi();
 
@@ -111,6 +119,7 @@ window.addEventListener('load', async () => {
     if (!event.isPrimary) return;
     state.pointerDown = true;
     canvas.setPointerCapture(event.pointerId);
+    recordPointer('down', event);
     state.activeStroke = createStroke(pointerToPoint(event, canvas), { ...state.brush });
     shell.classList.toggle('has-drawn', true);
     render();
@@ -118,6 +127,7 @@ window.addEventListener('load', async () => {
 
   const onPointerMove = (event) => {
     if (!state.pointerDown || !state.activeStroke) return;
+    recordPointer('move', event);
     appendPoint(state.activeStroke, pointerToPoint(event, canvas));
     state.activeStroke.raster = null;
     render();
@@ -127,6 +137,7 @@ window.addEventListener('load', async () => {
     if (!state.pointerDown) return;
     state.pointerDown = false;
     if (state.activeStroke) {
+      recordPointer('up', event);
       appendPoint(state.activeStroke, pointerToPoint(event, canvas));
       state.strokes.push(state.activeStroke);
       state.activeStroke = null;
@@ -134,7 +145,10 @@ window.addEventListener('load', async () => {
     render();
   };
 
-  const onPointerCancel = () => {
+  const onPointerCancel = (event) => {
+    if (event) {
+      recordPointer('cancel', event);
+    }
     state.pointerDown = false;
     state.activeStroke = null;
     shell.classList.toggle('has-drawn', state.strokes.length > 0);
@@ -182,6 +196,10 @@ window.addEventListener('load', async () => {
       ['Scale', String(state.renderScale.toFixed(2))],
     ].map(([label, value]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('');
     drawMeta.textContent = state.activeStroke ? 'WASM が入力中の線を描画しています' : 'Rust 側で線をラスタライズして Canvas に表示します';
+    pointerState.textContent = state.pointerDown ? 'drawing' : 'idle';
+    pointerType.textContent = state.lastPointerType || 'none';
+    pointerMeta.textContent = state.lastPointerMeta || 'pointer events waiting';
+    pointerLog.textContent = state.pointerLog || '-';
   }
 
   function rasterizeStroke(stroke, width, height) {
@@ -203,6 +221,15 @@ window.addEventListener('load', async () => {
     const imageData = new ImageData(new Uint8ClampedArray(raster.pixels), raster.width, raster.height);
     stroke.raster = { key, imageData };
     return imageData;
+  }
+
+  function recordPointer(kind, event) {
+    const pressure = typeof event.pressure === 'number' ? event.pressure.toFixed(2) : 'n/a';
+    const type = event.pointerType || 'unknown';
+    const pt = pointerToPoint(event, canvas);
+    state.lastPointerType = type;
+    state.lastPointerMeta = `${kind} / ${type} / pressure ${pressure} / x ${Math.round(pt.x)} y ${Math.round(pt.y)}`;
+    state.pointerLog = `${kind} id=${event.pointerId} type=${type} pressure=${pressure} buttons=${event.buttons}`;
   }
 
   function invalidateRasters() {
@@ -228,7 +255,7 @@ window.addEventListener('load', async () => {
 
 async function loadWasmProcessor() {
   if (!wasmProcessorPromise) {
-    wasmProcessorPromise = import('./wasm/bridge.js').then(async (module) => {
+    wasmProcessorPromise = import('./wasm-draw/bridge.js').then(async (module) => {
       wasmProcessor = await module.createProcessor();
       return wasmProcessor;
     });

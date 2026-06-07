@@ -71,6 +71,14 @@
         <section class="stage">
           <div class="canvas-shell collab-canvas-shell" id="canvasShell">
             <canvas id="annotationCanvas"></canvas>
+            <div class="pointer-hud" id="pointerHud">
+              <div class="pointer-hud-head">
+                <span class="status-pill" id="pointerState">idle</span>
+                <span class="chip" id="pointerType">none</span>
+              </div>
+              <div class="pointer-hud-meta" id="pointerMeta">pointer events waiting</div>
+              <pre class="pointer-hud-log" id="pointerLog">-</pre>
+            </div>
             <div class="empty-state">
               <div class="empty-card">
                 <p class="eyebrow">wasm raster</p>
