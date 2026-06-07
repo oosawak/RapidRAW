@@ -12,6 +12,7 @@ const state = {
   lastFpsTick: performance.now(),
   frameCount: 0,
   renderScale: 1,
+  wasmStatus: 'loading',
   lastPointerType: 'none',
   lastPointerMeta: 'pointer events waiting',
   pointerLog: '-',
@@ -45,6 +46,7 @@ window.addEventListener('load', async () => {
     statusPill.textContent = `WASM: ${processor.kind}`;
     statusPill.dataset.state = 'ready';
     document.body.dataset.wasmKind = processor.kind;
+    state.wasmStatus = 'ready';
     console.info('[wasm-draw] processor ready', {
       version: WASM_DRAW_REV,
       kind: processor.kind,
@@ -53,6 +55,7 @@ window.addEventListener('load', async () => {
     console.error('Failed to initialize WASM processor', error);
     statusPill.textContent = 'WASM error';
     statusPill.dataset.state = 'error';
+    state.wasmStatus = 'error';
     return;
   }
 
@@ -62,6 +65,7 @@ window.addEventListener('load', async () => {
   if (!context || !scratchContext) {
     statusPill.textContent = 'Canvas error';
     statusPill.dataset.state = 'error';
+    state.wasmStatus = 'canvas-error';
     return;
   }
 
@@ -205,6 +209,8 @@ window.addEventListener('load', async () => {
     shell.classList.toggle('has-drawn', state.strokes.length > 0 || Boolean(state.activeStroke));
     fpsValue.textContent = String(state.fpsValue);
     statusGrid.innerHTML = [
+      ['Version', WASM_DRAW_REV],
+      ['Load', state.wasmStatus],
       ['Strokes', String(state.strokes.length)],
       ['Active', state.activeStroke ? 'yes' : 'no'],
       ['Brush', `${state.brush.size}px`],
