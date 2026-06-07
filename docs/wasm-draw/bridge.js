@@ -1,4 +1,5 @@
 let processorPromise = null;
+const WASM_DRAW_REV = '6d9c7ed6';
 
 export async function createProcessor() {
   if (!processorPromise) {
@@ -17,10 +18,12 @@ async function loadProcessor() {
 
 async function tryLoadWasmModule() {
   try {
+    console.info('[wasm-draw] importing rapidraw_wasm', { version: WASM_DRAW_REV });
     const mod = await import("./rapidraw_wasm.js?rev=6d9c7ed6");
     if (typeof mod.default === "function") {
       await mod.default();
     }
+    console.info('[wasm-draw] wasm module loaded', { version: WASM_DRAW_REV });
     return mod;
   } catch (error) {
     console.error("Failed to load rapidraw_wasm", error);
@@ -68,6 +71,29 @@ function createWasmProcessor(mod) {
     },
     rasterizeStroke(points, brush, width, height, spacing = 6, opacity = 1) {
       const flatInput = flattenPoints(points);
+      if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1) {
+        console.warn('[wasm-draw] skipping rasterize due to invalid size', {
+          version: WASM_DRAW_REV,
+          width,
+          height,
+          points: flatInput.length / 2,
+          spacing,
+          opacity,
+        });
+        return {
+          width,
+          height,
+          pixels: new Uint8ClampedArray(0),
+        };
+      }
+      console.info('[wasm-draw] rasterize', {
+        version: WASM_DRAW_REV,
+        width,
+        height,
+        points: flatInput.length / 2,
+        spacing,
+        opacity,
+      });
       const output = mod.rasterize_stroke_rgba(
         width,
         height,

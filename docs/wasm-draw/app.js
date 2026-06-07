@@ -1,5 +1,6 @@
 let wasmProcessor = null;
 let wasmProcessorPromise = null;
+const WASM_DRAW_REV = '6d9c7ed6';
 
 const state = {
   strokes: [],
@@ -37,11 +38,17 @@ window.addEventListener('load', async () => {
     return;
   }
 
+  console.info('[wasm-draw] version', WASM_DRAW_REV);
+
   try {
     const processor = await loadWasmProcessor();
     statusPill.textContent = `WASM: ${processor.kind}`;
     statusPill.dataset.state = 'ready';
     document.body.dataset.wasmKind = processor.kind;
+    console.info('[wasm-draw] processor ready', {
+      version: WASM_DRAW_REV,
+      kind: processor.kind,
+    });
   } catch (error) {
     console.error('Failed to initialize WASM processor', error);
     statusPill.textContent = 'WASM error';
@@ -111,6 +118,14 @@ window.addEventListener('load', async () => {
     canvas.style.height = `${height}px`;
     scratchCanvas.width = canvas.width;
     scratchCanvas.height = canvas.height;
+    console.info('[wasm-draw] resize', {
+      version: WASM_DRAW_REV,
+      cssWidth: width,
+      cssHeight: height,
+      dpr,
+      pixelWidth: canvas.width,
+      pixelHeight: canvas.height,
+    });
     invalidateRasters();
     render();
   };
@@ -210,6 +225,15 @@ window.addEventListener('load', async () => {
       return null;
     }
     if (!stroke || !Array.isArray(stroke.points) || stroke.points.length < 2) {
+      return null;
+    }
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1) {
+      console.warn('[wasm-draw] invalid raster size', {
+        version: WASM_DRAW_REV,
+        width,
+        height,
+        points: stroke.points.length,
+      });
       return null;
     }
     const brushColor = typeof stroke.color === 'string' && stroke.color.length > 0 ? stroke.color : state.brush.color;
