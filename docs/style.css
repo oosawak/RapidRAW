@@ -1598,8 +1598,15 @@ body[data-wasm-error]::after {
 }
 
 .hub-grid-single .hub-intro {
-  max-width: 980px;
+  width: min(100%, 1100px);
   margin: 0 auto;
+}
+
+.hub-intro .card-head,
+.hub-intro .card-copy,
+.hub-intro .hub-launches,
+.hub-intro .hub-note {
+  width: min(100%, 860px);
 }
 
 .hub-summary {
