@@ -1,5 +1,5 @@
 let processorPromise = null;
-const WASM_DRAW_REV = '6d9c7ed6';
+const WASM_DRAW_REV = '8cb921de';
 
 export async function createProcessor() {
   if (!processorPromise) {
@@ -19,7 +19,7 @@ async function loadProcessor() {
 async function tryLoadWasmModule() {
   try {
     console.info('[wasm-draw] importing rapidraw_wasm', { version: WASM_DRAW_REV });
-    const mod = await import("./rapidraw_wasm.js?rev=6d9c7ed6");
+    const mod = await import("./rapidraw_wasm.js?rev=8cb921de");
     if (typeof mod.default === "function") {
       await mod.default();
     }

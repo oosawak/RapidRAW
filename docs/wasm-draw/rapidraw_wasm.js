@@ -401,7 +401,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (module_or_path === undefined) {
-        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=6d9c7ed6', import.meta.url);
+        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=8cb921de', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
