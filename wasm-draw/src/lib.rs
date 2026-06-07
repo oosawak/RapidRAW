@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -97,9 +98,28 @@ pub fn rasterize_stroke_rgba(
     size: f32,
     opacity: f32,
 ) -> Vec<u8> {
+    console::log_1(&format!(
+        "[wasm-draw-rust] rasterize_stroke_rgba width={} height={} points={} spacing={} size={} opacity={}",
+        width,
+        height,
+        points.len(),
+        spacing,
+        size,
+        opacity,
+    ).into());
+
     let pixel_count = match width.checked_mul(height).and_then(|px| px.checked_mul(4)) {
-        Some(px) => px as usize,
-        None => return Vec::new(),
+        Some(px) => {
+            console::log_1(&format!(
+                "[wasm-draw-rust] pixel_count={} bytes",
+                px
+            ).into());
+            px as usize
+        }
+        None => {
+            console::log_1(&"[wasm-draw-rust] pixel_count overflow".into());
+            return Vec::new();
+        }
     };
     let mut buffer = vec![0u8; pixel_count];
     if width == 0 || height == 0 {
