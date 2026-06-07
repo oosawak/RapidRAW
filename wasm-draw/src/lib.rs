@@ -59,7 +59,7 @@ pub fn interpolate_points(points: Vec<f32>, spacing: f32) -> Vec<f32> {
         return points;
     }
 
-    let mut out = Vec::with_capacity(points.len() * 2);
+    let mut out = Vec::with_capacity(points.len().saturating_mul(2));
     let mut prev = path[0];
     out.extend_from_slice(&[prev.0, prev.1]);
 
