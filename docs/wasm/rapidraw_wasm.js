@@ -184,6 +184,7 @@ function __wbg_get_imports() {
     return {
         __proto__: null,
         "./rapidraw_wasm_bg.js": import0,
+        "__wbindgen_placeholder__": import0,
     };
 }
 
