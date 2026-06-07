@@ -145,6 +145,7 @@ export function start() {
 }
 function __wbg_get_imports() {
     const import0 = {
+        __wbindgen_describe: function() {},
         __wbg___wbindgen_throw_1506f2235d1bdba0: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
@@ -170,6 +171,7 @@ function __wbg_get_imports() {
             getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
             getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
         },
+        __wbindgen_object_drop_ref: function() {},
         __wbindgen_init_externref_table: function() {
             const table = wasm.__wbindgen_externrefs;
             const offset = table.grow(4);
@@ -180,9 +182,16 @@ function __wbg_get_imports() {
             table.set(offset + 3, false);
         },
     };
+    const import1 = {
+        __wbindgen_externref_table_grow: function(delta) {
+            return delta;
+        },
+        __wbindgen_externref_table_set_null: function() {},
+    };
     return {
         "./rapidraw_wasm_bg.js": import0,
         "__wbindgen_placeholder__": import0,
+        "__wbindgen_externref_xform__": import1,
     };
 }
 
@@ -316,7 +325,11 @@ function __wbg_finalize_init(instance, module) {
     cachedDataViewMemory0 = null;
     cachedFloat32ArrayMemory0 = null;
     cachedUint8ArrayMemory0 = null;
-    wasm.__wbindgen_start();
+    if (typeof wasm.__wbindgen_start === "function") {
+        wasm.__wbindgen_start();
+    } else if (typeof wasm.start === "function") {
+        wasm.start();
+    }
     return wasm;
 }
 
