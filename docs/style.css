@@ -1178,3 +1178,242 @@ body {
     max-height: 180px;
   }
 }
+
+/* Collaboration preview overrides */
+body[data-wasm-error]::after {
+  content: attr(data-wasm-error);
+  position: fixed;
+  inset: auto 16px 16px 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(120, 40, 40, 0.92);
+  color: #fff;
+  z-index: 50;
+}
+
+.guide-panel[hidden] {
+  display: none !important;
+}
+
+.topbar-status {
+  min-width: 0;
+}
+
+.topbar-status .muted {
+  max-width: 42ch;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.field input[type="text"],
+.field input[type="range"],
+.field input[type="color"] {
+  width: 100%;
+}
+
+.field input[type="text"] {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+.field input[type="text"]:focus {
+  border-color: rgba(116, 214, 255, 0.45);
+}
+
+.field input[type="range"] {
+  accent-color: var(--accent);
+}
+
+.field input[type="color"] {
+  height: 44px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.collab-shell {
+  max-width: 1520px;
+}
+
+.collab-grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 340px;
+  gap: 18px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.collab-panel-left,
+.collab-panel-right {
+  min-height: 0;
+  align-content: start;
+}
+
+.collab-stage {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.collab-canvas-shell {
+  min-height: 0;
+  height: 100%;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+.collab-canvas-shell canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  touch-action: none;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.status-grid dt,
+.status-grid dd {
+  margin: 0;
+}
+
+.status-grid dt {
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.status-grid dd {
+  font-size: 0.92rem;
+  word-break: break-word;
+}
+
+.filmstrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.filmstrip-item {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.filmstrip-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.filmstrip-item strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.feed {
+  margin: 0;
+  min-height: 240px;
+  max-height: 100%;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.confirmation-banner,
+.guide-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1180px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .collab-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .collab-panel-left,
+  .collab-panel-right {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filmstrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .topbar,
+  .card,
+  .canvas-shell,
+  .guide-panel {
+    border-radius: 16px;
+  }
+
+  .topbar-actions {
+    justify-content: flex-start;
+  }
+
+  .collab-panel-left,
+  .collab-panel-right {
+    grid-template-columns: 1fr;
+  }
+
+  .collab-canvas-shell {
+    height: min(58svh, 560px);
+  }
+
+  .filmstrip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .feed {
+    max-height: 180px;
+  }
+}

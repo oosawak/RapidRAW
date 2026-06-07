@@ -26,23 +26,24 @@
 
         <div class="topbar-status">
           <span class="status-pill" id="statusPill">WASM canvas</span>
-          <span class="muted" id="imageMeta">Draw, add remote samples, and inspect the feed</span>
+          <span class="muted" id="imageMeta">Canvas first. Guide is hidden by default and can be opened from the top bar.</span>
         </div>
 
         <div class="topbar-actions">
           <a class="button button-ghost" href="./index.html">Hub</a>
+          <button class="button button-ghost" id="guideToggleButton" type="button" aria-pressed="false">Show Guide</button>
           <button class="button button-ghost" id="addRemoteStrokeButton" type="button">Add Remote</button>
           <button class="button button-ghost" id="clearStrokesButton" type="button">Clear</button>
         </div>
       </header>
 
-      <section class="card confirmation-banner">
+      <section class="card guide-panel" id="guidePanel" hidden>
         <div class="confirmation-copy">
           <p class="eyebrow">confirmation screen</p>
           <h2>実際の確認用画面</h2>
           <p>
-            ここが GitHub Pages 上で見るための確認用画面です。下のキャンバスで描画を試し、
-            右側のフィードで更新内容を確認できます。
+            この領域は説明用です。普段は隠れていて、必要な時だけ開きます。描画画面を邪魔しないように、
+            使う時だけ見えるようにしました。
           </p>
           <div class="confirmation-tags">
             <span class="chip">local stroke</span>
@@ -84,11 +85,19 @@
             </div>
             <div class="collapsible-body" id="sessionCard">
               <p class="card-copy">
-                これは Pages で確認するためのコラボ描画プレビューです。ここで書いた線はローカル保存されます。
+                ここで書いた線はローカル保存されます。ブラシの色と太さを変えて試せます。
               </p>
               <label class="field">
                 <span>User ID</span>
                 <input id="userIdInput" type="text" value="me" />
+              </label>
+              <label class="field">
+                <span>Brush Size</span>
+                <input id="brushSizeInput" type="range" min="1" max="28" step="1" value="8" />
+              </label>
+              <label class="field">
+                <span>Brush Color</span>
+                <input id="brushColorInput" type="color" value="#f08c46" />
               </label>
             </div>
           </section>

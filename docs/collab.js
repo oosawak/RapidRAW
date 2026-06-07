@@ -4,6 +4,11 @@ let wasmProcessorPromise = null;
 const STORAGE_KEY = "rapidraw-studio-strokes";
 const FPS_SAMPLE_MS = 1000;
 
+const drawSettings = {
+  size: 8,
+  color: "#f08c46",
+};
+
 const strokesState = {
   strokes: [],
   activeStroke: null,
@@ -15,35 +20,67 @@ const uiState = {
   fpsValue: 0,
   lastFpsTick: performance.now(),
   frameCount: 0,
-  rafId: 0,
 };
 
 window.addEventListener("load", async () => {
-  try {
-    await loadWasmProcessor();
-  } catch (error) {
-    console.error("Failed to initialize WASM processor", error);
-    document.body.dataset.wasmError = error instanceof Error ? error.message : String(error);
-    return;
-  }
-
   const canvas = document.getElementById("annotationCanvas");
   const shell = document.getElementById("canvasShell");
   const userIdInput = document.getElementById("userIdInput");
+  const brushSizeInput = document.getElementById("brushSizeInput");
+  const brushColorInput = document.getElementById("brushColorInput");
   const addRemoteStrokeButton = document.getElementById("addRemoteStrokeButton");
   const clearStrokesButton = document.getElementById("clearStrokesButton");
+  const guideToggleButton = document.getElementById("guideToggleButton");
+  const guidePanel = document.getElementById("guidePanel");
+  const statusPill = document.getElementById("statusPill");
   const strokeFeed = document.getElementById("strokeFeed");
   const strokeStats = document.getElementById("strokeStats");
   const fpsValue = document.getElementById("fpsValue");
   const collapseButtons = document.querySelectorAll("[data-collapse-target]");
 
-  if (!canvas || !shell || !userIdInput || !addRemoteStrokeButton || !clearStrokesButton || !strokeFeed || !strokeStats || !fpsValue) {
+  if (!canvas || !shell || !userIdInput || !brushSizeInput || !brushColorInput || !addRemoteStrokeButton || !clearStrokesButton || !guideToggleButton || !guidePanel || !statusPill || !strokeFeed || !strokeStats || !fpsValue) {
+    return;
+  }
+
+  try {
+    const processor = await loadWasmProcessor();
+    statusPill.textContent = `WASM: ${processor.kind}`;
+    statusPill.dataset.state = "ready";
+    document.body.dataset.wasmKind = processor.kind;
+  } catch (error) {
+    console.error("Failed to initialize WASM processor", error);
+    statusPill.textContent = "WASM error";
+    statusPill.dataset.state = "error";
+    document.body.dataset.wasmError = error instanceof Error ? error.message : String(error);
     return;
   }
 
   const context = canvas.getContext("2d", { alpha: true });
   strokesState.strokes = loadStrokes();
   strokesState.seq = strokesState.strokes.reduce((max, stroke) => Math.max(max, Number(stroke.seq || 0)), 0);
+
+  const syncGuideVisibility = (visible) => {
+    guidePanel.hidden = !visible;
+    guideToggleButton.setAttribute("aria-pressed", String(visible));
+    guideToggleButton.textContent = visible ? "Hide Guide" : "Show Guide";
+  };
+
+  syncGuideVisibility(false);
+
+  guideToggleButton.addEventListener("click", () => {
+    syncGuideVisibility(guidePanel.hidden);
+  });
+
+  brushSizeInput.addEventListener("input", () => {
+    const value = Number(brushSizeInput.value);
+    drawSettings.size = Number.isFinite(value) ? value : drawSettings.size;
+    render();
+  });
+
+  brushColorInput.addEventListener("input", () => {
+    drawSettings.color = brushColorInput.value || drawSettings.color;
+    render();
+  });
 
   collapseButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -91,9 +128,9 @@ window.addEventListener("load", async () => {
         uiState.lastFpsTick = now;
         fpsValue.textContent = String(uiState.fpsValue);
       }
-      uiState.rafId = window.requestAnimationFrame(tick);
+      window.requestAnimationFrame(tick);
     };
-    uiState.rafId = window.requestAnimationFrame(tick);
+    window.requestAnimationFrame(tick);
   };
 
   const onPointerDown = (event) => {
@@ -198,13 +235,14 @@ function loadStrokes() {
 
 function createStroke(source, userId, firstPoint) {
   const seq = ++strokesState.seq;
+  const isRemote = source === "remote";
   return {
     seq,
     stroke_id: `${source}-${Date.now()}-${seq}`,
     user_id: userId,
     tool: "brush",
-    color: source === "remote" ? "#74d6ff" : "#f08c46",
-    size: source === "remote" ? 5 : 8,
+    color: isRemote ? "#74d6ff" : drawSettings.color,
+    size: isRemote ? 5 : drawSettings.size,
     points: firstPoint ? [firstPoint] : [],
     timestamp: new Date().toISOString(),
     source,
@@ -283,7 +321,8 @@ function renderStats(target, fpsValue) {
     ["Local", String(localCount)],
     ["Remote", String(remoteCount)],
     ["Active", active],
-    ["Tool", "brush"],
+    ["Brush", `${drawSettings.size}px`],
+    ["Color", drawSettings.color],
     ["FPS", String(uiState.fpsValue)],
   ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
