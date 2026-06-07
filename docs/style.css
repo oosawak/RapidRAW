@@ -1612,7 +1612,6 @@ body[data-wasm-error]::after {
   width: 100%;
 }
 
-
 .collab-shell .topbar-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1623,8 +1622,6 @@ body[data-wasm-error]::after {
 .collab-shell .topbar-actions .button {
   width: 100%;
   min-width: 0;
-  padding: 9px 10px;
-  font-size: 0.82rem;
 }
 
 @media (max-width: 760px) {
@@ -1635,27 +1632,6 @@ body[data-wasm-error]::after {
   .collab-shell .topbar-actions {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
-  .collab-shell .topbar-actions .button {
-    padding: 8px 8px;
-    font-size: 0.76rem;
-  }
-}
-
-
-/* Adopted canvas screen sizing */
-.collab-shell .topbar-actions {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  justify-content: stretch;
-}
-
-.collab-shell .topbar-actions .button {
-  width: 100%;
-  min-width: 0;
-  padding: 8px 10px;
-  font-size: 0.8rem;
 }
 
 .collab-canvas-shell {
