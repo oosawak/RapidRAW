@@ -6,16 +6,19 @@
 
 - `docs/index.html`
 - ここを最初の導線にする
-- `Demo` と `RapidRAW` は別ページとして用意する
+- `WASM Lab`、`WASM Drawing`、`RapidRAW` は別ページとして用意する
 - ボタンは `innerHTML` を差し替えるのではなく、別ページへ直接移動する
 
 ## 画面の役割
 
-- `docs/demo.html`
-  - お絵かきチャットの確認用画面
-  - WASM ベースの描画確認
+- `docs/wasm-lab.html`
+  - WASM で整形した線を Canvas に描く採用版の画面
   - ブラシ色・太さの確認
   - JSON ログの確認
+
+- `docs/wasm-draw.html`
+  - これから作る WASM 直描画の確認ページ
+  - WASM でピクセルを描く実装の入口
 
 - `docs/rapidraw.html`
   - RapidRAW 風の確認用画面
@@ -25,14 +28,15 @@
 ## 使い方
 
 - まず `index.html` を開く
-- `Demo` を選ぶと `demo.html` を開く
+- `WASM Lab` を選ぶと `wasm-lab.html` を開く
+- `WASM Drawing` を選ぶと `wasm-draw.html` を開く
 - `RapidRAW` を選ぶと `rapidraw.html` を開く
 - どちらも GitHub Pages 内だけで完結させる
 
 ## この構成にした理由
 
 - 入口を 1 つに集約すると説明しやすい
-- デモと RapidRAW を別ページとして見せやすい
+- WASM ラボ、WASM Drawing、RapidRAW を別ページとして見せやすい
 - 画面ごとの役割が分かれ、更新しやすい
 - 追加した内容を GitHub Pages 上で確認しやすい
 

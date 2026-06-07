@@ -1561,6 +1561,16 @@ body[data-wasm-error]::after {
 }
 
 
+/* Title line should stay single-line in the header */
+.topbar-status .canvas-title-line {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Final title behavior override */
 .collab-canvas-shell.has-drawn .empty-state {
   opacity: 1 !important;
@@ -1579,4 +1589,129 @@ body[data-wasm-error]::after {
 .collab-canvas-shell.has-drawn .empty-card p {
   display: block !important;
   margin-top: 0 !important;
+}
+
+
+/* Hub single-column layout */
+.hub-grid-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hub-grid-single .hub-intro {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.hub-summary {
+  margin-top: 16px;
+}
+
+.hub-summary li {
+  padding: 12px 14px;
+}
+
+
+.collab-shell .topbar-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  justify-content: stretch;
+}
+
+.collab-shell .topbar-actions .button {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 760px) {
+  .collab-shell .topbar {
+    gap: 10px;
+  }
+
+  .collab-shell .topbar-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .collab-shell .topbar-actions .button {
+    padding: 8px 8px;
+    font-size: 0.76rem;
+  }
+}
+
+
+/* Adopted canvas screen sizing */
+.collab-shell .topbar-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  justify-content: stretch;
+}
+
+.collab-shell .topbar-actions .button {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+}
+
+.collab-canvas-shell {
+  min-height: clamp(700px, 78svh, 980px);
+}
+
+.collab-canvas-shell #annotationCanvas {
+  min-height: clamp(700px, 78svh, 980px);
+}
+
+@media (max-width: 840px) {
+  .collab-shell .topbar-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .collab-shell .topbar-actions .button {
+    padding: 7px 8px;
+    font-size: 0.74rem;
+  }
+
+  .collab-canvas-shell,
+  .collab-canvas-shell #annotationCanvas {
+    min-height: 66svh;
+  }
+}
+
+
+/* Keep the color picker compact on the adopted canvas screen */
+.collab-shell .field {
+  justify-items: start;
+}
+
+.collab-shell .field input[type="color"] {
+  width: 110px;
+  max-width: 110px;
+  height: 44px;
+  padding: 6px;
+}
+
+.collab-shell .field input[type="range"] {
+  width: 100%;
+}
+
+@media (max-width: 840px) {
+  .collab-shell .field input[type="color"] {
+    width: 96px;
+    max-width: 96px;
+    height: 40px;
+  }
+}
+
+
+/* Keep the adopted canvas screen status lines on one line */
+.collab-shell .topbar-status .muted,
+.collab-shell .topbar-status .canvas-title-line {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

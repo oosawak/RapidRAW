@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>WASM Drawing</title>
+    <meta
+      name="description"
+      content="これから作る WASM 描画ページの入口です。WASM でピクセルを描く実装をここに載せます。"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="backdrop backdrop-a"></div>
+    <div class="backdrop backdrop-b"></div>
+
+    <div class="app-shell hub-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">WD</div>
+          <div>
+            <p class="eyebrow">work in progress</p>
+            <h1>WASM Drawing</h1>
+          </div>
+        </div>
+
+        <div class="topbar-status">
+          <span class="status-pill">Planned screen</span>
+          <span class="muted">WASM で直接描画する画面をここに作ります</span>
+        </div>
+
+        <div class="topbar-actions">
+          <a class="button button-ghost" href="./index.html">Hub</a>
+          <a class="button button-ghost" href="./wasm-lab.html">WASM Lab</a>
+          <a class="button button-ghost" href="./rapidraw.html">RapidRAW</a>
+        </div>
+      </header>
+
+      <main class="hub-grid hub-grid-single">
+        <section class="card hub-intro">
+          <div class="card-head">
+            <h2>Planned WASM Drawing</h2>
+            <span class="chip">soon</span>
+          </div>
+          <p class="card-copy">
+            このページは、これから作る WASM 直描画の確認画面です。
+            今は入口だけ用意してあり、WASM でピクセルを直接描く実装をここに載せる予定です。
+          </p>
+
+          <div class="hub-launches">
+            <a class="hub-launch-card is-active" href="./wasm-draw.html" target="_blank" rel="noreferrer">
+              <span class="hub-card-kicker">Preview</span>
+              <strong>WASM Drawing</strong>
+              <span class="hub-card-copy">将来の描画ページの入口</span>
+            </a>
+          </div>
+
+          <div class="hub-note">
+            <strong>Note</strong>
+            <span>WASM での直接描画実装が入ったら、このページを採用版にします。</span>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -11,14 +11,15 @@
 ## 2. GitHub Pages の役割
 
 - `docs/index.html` を入口ページにする
-- `docs/demo.html` を確認用の描画画面にする
+- `docs/wasm-lab.html` を採用版の Canvas 描画画面にする
+- `docs/wasm-draw.html` を今後の WASM 直描画ページの入口にする
 - `docs/rapidraw.html` を RapidRAW 風の確認ページにする
 - `localhost` は確認導線に使わない
 
 ## 3. 描画の役割分担
 
 - 自分の描画は `WASM` で前処理する
-- 他人の描画は `Canvas` 側の表示で扱う
+- 他人の描画や採用版の表示は `Canvas` 側で扱う
 - 共有するデータは中立的な `stroke` 情報にする
 
 ## 4. WASM の担当範囲
@@ -33,7 +34,7 @@
 
 - 画面全体の説明 UI
 - 入口ページの案内
-- 相手側ストロークの単純表示
+- 採用版の Canvas 表示
 - 画面レイアウトの大枠
 
 ## 6. 画面の見せ方
