@@ -17,7 +17,7 @@ async function loadProcessor() {
 
 async function tryLoadWasmModule() {
   try {
-    const mod = await import("./rapidraw_wasm.js");
+    const mod = await import(`./rapidraw_wasm.js?v=9d874468`);
     if (typeof mod.default === "function") {
       await mod.default();
     }
