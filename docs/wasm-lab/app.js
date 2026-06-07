@@ -298,7 +298,7 @@ function clampStrokes(strokes) {
 
 async function loadWasmProcessor() {
   if (!wasmProcessorPromise) {
-    wasmProcessorPromise = import('./wasm/bridge.js').then(async (module) => {
+    wasmProcessorPromise = import('../wasm/bridge.js').then(async (module) => {
       wasmProcessor = await module.createProcessor();
       return wasmProcessor;
     });

@@ -6,8 +6,8 @@
 
 - `docs/index.html` は入口ページです
 - `docs/rapidraw.html` は RapidRAW 風の確認用画面です
-- `docs/wasm-lab.html` は Canvas 描画ページです
-- `docs/wasm-draw.html` はこれから作る WASM 描画ページです
+- `docs/wasm-lab/index.html` は Canvas 描画ページです
+- `docs/wasm-draw/index.html` はこれから作る WASM 描画ページです
 - `index.html` はプロジェクト説明を含む入口ページです
 - `index.html` のリンクは別ページを開く形です
 - GitHub Pages の公開先を `docs/` に設定してください

@@ -255,7 +255,7 @@ window.addEventListener('load', async () => {
 
 async function loadWasmProcessor() {
   if (!wasmProcessorPromise) {
-    wasmProcessorPromise = import('./wasm-draw/bridge.js').then(async (module) => {
+    wasmProcessorPromise = import('./bridge.js').then(async (module) => {
       wasmProcessor = await module.createProcessor();
       return wasmProcessor;
     });

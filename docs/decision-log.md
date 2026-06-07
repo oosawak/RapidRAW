@@ -11,8 +11,8 @@
 ## 2. GitHub Pages の役割
 
 - `docs/index.html` を入口ページにする
-- `docs/wasm-lab.html` を Canvas 描画ページにする
-- `docs/wasm-draw.html` を今後の WASM 直描画ページの入口にする
+- `docs/wasm-lab/index.html` を Canvas 描画ページにする
+- `docs/wasm-draw/index.html` を今後の WASM 直描画ページの入口にする
 - `docs/rapidraw.html` を RapidRAW 風の確認ページにする
 - `localhost` は確認導線に使わない
 

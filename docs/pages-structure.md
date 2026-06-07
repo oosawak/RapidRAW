@@ -11,12 +11,12 @@
 
 ## 画面の役割
 
-- `docs/wasm-lab.html`
+- `docs/wasm-lab/index.html`
   - WASM で整形した線を Canvas に描く画面
   - ブラシ色・太さの確認
   - JSON ログの確認
 
-- `docs/wasm-draw.html`
+- `docs/wasm-draw/index.html`
   - これから作る WASM 直描画の確認ページ
   - WASM でピクセルを描く実装の入口
 
@@ -28,8 +28,8 @@
 ## 使い方
 
 - まず `index.html` を開く
-- `WASM Lab` を選ぶと `wasm-lab.html` を開く
-- `WASM Drawing` を選ぶと `wasm-draw.html` を開く
+- `WASM Lab` を選ぶと `wasm-lab/index.html` を開く
+- `WASM Drawing` を選ぶと `wasm-draw/index.html` を開く
 - `RapidRAW` を選ぶと `rapidraw.html` を開く
 - どちらも GitHub Pages 内だけで完結させる
 
