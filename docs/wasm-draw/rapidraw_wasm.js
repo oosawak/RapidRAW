@@ -145,7 +145,6 @@ export function start() {
 }
 function __wbg_get_imports() {
     const import0 = {
-        __proto__: null,
         __wbg___wbindgen_throw_1506f2235d1bdba0: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
@@ -182,7 +181,6 @@ function __wbg_get_imports() {
         },
     };
     return {
-        __proto__: null,
         "./rapidraw_wasm_bg.js": import0,
         "__wbindgen_placeholder__": import0,
     };
