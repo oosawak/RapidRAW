@@ -6,7 +6,7 @@
     <title>Canvas Stroke Lab</title>
     <meta
       name="description"
-      content="RapidRAW の採用版 Canvas 描画画面。WASM で整形した点列を Canvas に描く構成を確認できます。"
+      content="RapidRAW の Canvas 描画ページ。WASM で整形した点列を Canvas に描く構成を確認できます。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -19,15 +19,15 @@
         <div class="brand">
           <div class="brand-mark">WL</div>
           <div>
-            <p class="eyebrow">adopted screen</p>
+            <p class="eyebrow">canvas screen</p>
             <h1>Canvas Stroke Lab</h1>
           </div>
         </div>
 
         <div class="topbar-status">
           <span class="status-pill" id="statusPill">WASM loading</span>
-          <span class="muted" id="imageMeta">Canvas is preserved. This screen checks the WASM stroke path separately.</span>
-          <span class="muted canvas-title-line" id="canvasTitleLine">Draw here to test interpolation</span>
+          <span class="muted" id="imageMeta">Canvas is preserved. This page checks the WASM stroke path separately.</span>
+          <span class="muted canvas-title-line" id="canvasTitleLine">Draw here to test canvas rendering</span>
         </div>
 
         <div class="topbar-actions">
@@ -49,7 +49,7 @@
             </div>
             <div class="collapsible-body" id="brushCard">
               <p class="card-copy">
-                この画面は既存の Canvas を置き換えず、WASM が受け取った色・太さ・点列をどう整形するかを確認するためのものです。
+                このページは既存の Canvas を使いながら、WASM が受け取った色・太さ・点列をどう整形するかを確認するためのものです。
               </p>
               <label class="field">
                 <span>Brush Size</span>
@@ -87,7 +87,7 @@
                 <p class="eyebrow">separate canvas</p>
                 <h2>Canvas rendered strokes</h2>
                 <p>
-                  Draw with the mouse or touch input. The committed stroke is prepared by WASM and then painted back onto the canvas as the adopted preview.
+                  Draw with the mouse or touch input. The committed stroke is prepared by WASM and then painted back onto the canvas.
                 </p>
               </div>
             </div>
@@ -96,7 +96,7 @@
           <div class="filmstrip">
             <div class="filmstrip-item">
               <span>Mode</span>
-              <strong>Canvas adopted</strong>
+              <strong>Canvas page</strong>
             </div>
             <div class="filmstrip-item">
               <span>Output</span>

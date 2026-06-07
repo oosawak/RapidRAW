@@ -6,7 +6,7 @@
 
 - `docs/index.html` は入口ページです
 - `docs/rapidraw.html` は RapidRAW 風の確認用画面です
-- `docs/wasm-lab.html` は採用する Canvas 版の描画画面です
+- `docs/wasm-lab.html` は Canvas 描画ページです
 - `docs/wasm-draw.html` はこれから作る WASM 描画ページです
 - `index.html` はプロジェクト説明を含む入口ページです
 - `index.html` のリンクは別ページを開く形です
@@ -15,7 +15,7 @@
 ## できること
 
 - RapidRAW 風の確認用画面
-- 採用版の Canvas 描画画面
+- Canvas 描画ページ
 - これから作る WASM 描画ページ
 - ローカルで描いたストロークの保存
 - 相手側ストロークのサンプル追加

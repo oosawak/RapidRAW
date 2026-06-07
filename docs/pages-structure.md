@@ -12,7 +12,7 @@
 ## 画面の役割
 
 - `docs/wasm-lab.html`
-  - WASM で整形した線を Canvas に描く採用版の画面
+  - WASM で整形した線を Canvas に描く画面
   - ブラシ色・太さの確認
   - JSON ログの確認
 

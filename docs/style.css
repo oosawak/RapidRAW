@@ -687,6 +687,10 @@ body::before {
   max-width: 1640px;
 }
 
+.hub-shell .topbar {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .hub-grid {
   display: grid;
   grid-template-columns: minmax(340px, 0.95fr) minmax(0, 1.35fr);
@@ -1598,23 +1602,14 @@ body[data-wasm-error]::after {
 }
 
 .hub-grid-single .hub-intro {
-  width: min(100%, 1100px);
-  margin: 0 auto;
+  width: 100%;
 }
 
 .hub-intro .card-head,
 .hub-intro .card-copy,
 .hub-intro .hub-launches,
 .hub-intro .hub-note {
-  width: min(100%, 860px);
-}
-
-.hub-summary {
-  margin-top: 16px;
-}
-
-.hub-summary li {
-  padding: 12px 14px;
+  width: 100%;
 }
 
 
