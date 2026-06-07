@@ -54,7 +54,6 @@ const canvasShell = document.getElementById("canvasShell");
 const resetButton = document.getElementById("resetButton");
 const exportButton = document.getElementById("exportButton");
 const savePresetButton = document.getElementById("savePresetButton");
-const demoPresetButton = document.getElementById("demoPresetButton");
 
 const state = {
   ...DEFAULT_STATE,
@@ -129,9 +128,6 @@ function bindEvents() {
     renderPresets();
   });
 
-  demoPresetButton.addEventListener("click", () => {
-    applyPreset(DEMO_PRESET);
-  });
 
   window.addEventListener("resize", () => {
     scheduleRender();
