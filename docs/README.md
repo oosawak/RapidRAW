@@ -24,6 +24,7 @@
 - 送受信イベントの可視化
 - 共有ルームの切り替え
 
-## Patch Tool
+## 記録
 
+- [Decision Log](./decision-log.md)
 - [Patch Tool](./patch-tool.md)
