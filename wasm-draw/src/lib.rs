@@ -97,7 +97,11 @@ pub fn rasterize_stroke_rgba(
     size: f32,
     opacity: f32,
 ) -> Vec<u8> {
-    let mut buffer = vec![0u8; width.saturating_mul(height).saturating_mul(4) as usize];
+    let pixel_count = match width.checked_mul(height).and_then(|px| px.checked_mul(4)) {
+        Some(px) => px as usize,
+        None => return Vec::new(),
+    };
+    let mut buffer = vec![0u8; pixel_count];
     if width == 0 || height == 0 {
         return buffer;
     }
