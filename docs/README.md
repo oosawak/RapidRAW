@@ -7,6 +7,7 @@
 - `docs/index.html` は入口ページです
 - `docs/demo.html` は今作っているコラボ描画の確認用画面です
 - `docs/rapidraw.html` は RapidRAW 風の確認用画面です
+- `index.html` のボタンは `innerHTML` 置換ではなく、別ページを切り替える形です
 - GitHub Pages の公開先を `docs/` に設定してください
 
 ## できること
@@ -27,4 +28,5 @@
 ## 記録
 
 - [Decision Log](./decision-log.md)
+- [Pages Structure](./pages-structure.md)
 - [Patch Tool](./patch-tool.md)
