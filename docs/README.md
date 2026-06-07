@@ -7,13 +7,16 @@
 - `docs/index.html` は入口ページです
 - `docs/demo.html` は今作っているコラボ描画の確認用画面です
 - `docs/rapidraw.html` は RapidRAW 風の確認用画面です
-- `index.html` のボタンは `innerHTML` 置換ではなく、別ページを切り替える形です
+- `docs/wasm-lab.html` は WASM 専用の別画面です
+- `index.html` はプロジェクト説明を含む入口ページです
+- `index.html` のリンクは別ページを開く形です
 - GitHub Pages の公開先を `docs/` に設定してください
 
 ## できること
 
 - コラボ描画の確認用画面
 - RapidRAW 風の確認用画面
+- WASM 専用の描画確認画面
 - ローカルで描いたストロークの保存
 - 相手側ストロークのサンプル追加
 - フィードの確認

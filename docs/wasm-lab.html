@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Oekaki Chat Preview</title>
+    <title>WASM Stroke Lab</title>
     <meta
       name="description"
-      content="GitHub Pages で確認する、お絵かきチャットのコラボ描画プレビュー。"
+      content="RapidRAW の WASM 描画経路だけを確認する別画面。既存の Canvas 画面は残したまま、補間と色・サイズの受け渡しを確認できます。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -17,82 +17,41 @@
     <div class="app-shell collab-shell">
       <header class="topbar">
         <div class="brand">
-          <div class="brand-mark">OC</div>
+          <div class="brand-mark">WL</div>
           <div>
-            <p class="eyebrow">preview page</p>
-            <h1>Oekaki Chat Preview</h1>
+            <p class="eyebrow">separate screen</p>
+            <h1>WASM Stroke Lab</h1>
           </div>
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill" id="statusPill">WASM canvas</span>
-          <span class="muted" id="imageMeta">Canvas first. Guide is hidden by default and can be opened from the top bar.</span>
-          <span class="muted canvas-title-line" id="canvasTitleLine">Draw on the canvas</span>
+          <span class="status-pill" id="statusPill">WASM loading</span>
+          <span class="muted" id="imageMeta">Canvas is preserved. This screen checks the WASM stroke path separately.</span>
+          <span class="muted canvas-title-line" id="canvasTitleLine">Draw here to test interpolation</span>
         </div>
 
         <div class="topbar-actions">
           <a class="button button-ghost" href="./index.html">Hub</a>
-          <button class="button button-ghost" id="guideToggleButton" type="button" aria-pressed="false">Show Guide</button>
-          <button class="button button-ghost" id="addRemoteStrokeButton" type="button">Add Remote</button>
-          <a class="button button-ghost" href="./wasm-lab.html">WASM Lab</a>
+          <a class="button button-ghost" href="./demo.html">Demo</a>
+          <button class="button button-ghost" id="addRemoteStrokeButton" type="button">Add Sample</button>
           <button class="button button-ghost" id="clearStrokesButton" type="button">Clear</button>
         </div>
       </header>
-
-      <section class="card guide-panel" id="guidePanel" hidden>
-        <div class="confirmation-copy">
-          <p class="eyebrow">confirmation screen</p>
-          <h2>実際の確認用画面</h2>
-          <p>
-            この領域は説明用です。普段は隠れていて、必要な時だけ開きます。描画画面を邪魔しないように、
-            使う時だけ見えるようにしました。
-          </p>
-          <div class="confirmation-tags">
-            <span class="chip">local stroke</span>
-            <span class="chip">remote sample</span>
-            <span class="chip">stroke feed</span>
-            <span class="chip">fps</span>
-          </div>
-        </div>
-
-        <div class="screen-mock" aria-hidden="true">
-          <div class="mock-topbar">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="mock-stage">
-            <div class="mock-stroke mock-stroke-local"></div>
-            <div class="mock-stroke mock-stroke-remote"></div>
-            <div class="mock-chip mock-chip-a"></div>
-            <div class="mock-chip mock-chip-b"></div>
-          </div>
-          <div class="mock-footer">
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-        </div>
-      </section>
 
       <main class="collab-grid">
         <aside class="panel collab-panel-left">
           <section class="card collapsible" data-collapsed="false">
             <div class="card-head">
-              <h2>Session</h2>
+              <h2>Brush</h2>
               <div class="card-head-actions">
-                <span class="chip">Pages</span>
-                <button class="icon-button" type="button" data-collapse-target="sessionCard" aria-label="Toggle Session panel">−</button>
+                <span class="chip">WASM</span>
+                <button class="icon-button" type="button" data-collapse-target="brushCard" aria-label="Toggle Brush panel">−</button>
               </div>
             </div>
-            <div class="collapsible-body" id="sessionCard">
+            <div class="collapsible-body" id="brushCard">
               <p class="card-copy">
-                ここで書いた線はローカル保存されます。ブラシの色と太さを変えて試せます。
+                この画面は既存の Canvas を置き換えず、WASM が受け取った色・太さ・点列をどう整形するかを確認するためのものです。
               </p>
-              <label class="field">
-                <span>User ID</span>
-                <input id="userIdInput" type="text" value="me" />
-              </label>
               <label class="field">
                 <span>Brush Size</span>
                 <input id="brushSizeInput" type="range" min="1" max="28" step="1" value="8" />
@@ -101,15 +60,18 @@
                 <span>Brush Color</span>
                 <input id="brushColorInput" type="color" value="#f08c46" />
               </label>
+              <div class="preset-actions">
+                <button class="button button-ghost" id="demoRemoteButton" type="button">Insert Remote Line</button>
+              </div>
             </div>
           </section>
 
           <section class="card collapsible" data-collapsed="false">
             <div class="card-head">
-              <h2>Stroke Stats</h2>
+              <h2>WASM Stats</h2>
               <div class="card-head-actions">
                 <span class="chip">live</span>
-                <button class="icon-button" type="button" data-collapse-target="statsCard" aria-label="Toggle Stroke Stats panel">−</button>
+                <button class="icon-button" type="button" data-collapse-target="statsCard" aria-label="Toggle WASM Stats panel">−</button>
               </div>
             </div>
             <div class="collapsible-body" id="statsCard">
@@ -120,12 +82,13 @@
 
         <section class="stage collab-stage">
           <div class="canvas-shell collab-canvas-shell" id="canvasShell">
-            <canvas id="annotationCanvas"></canvas>
+            <canvas id="wasmCanvas"></canvas>
             <div class="empty-state">
               <div class="empty-card">
-                <p class="eyebrow">shared canvas</p>
+                <p class="eyebrow">separate canvas</p>
+                <h2>WASM rendered strokes</h2>
                 <p>
-                  左クリックやタップで線を描けます。Add Remote で相手の線の見本を足せます。
+                  Draw with the mouse or touch input. The committed stroke is prepared by WASM and then painted back onto the canvas.
                 </p>
               </div>
             </div>
@@ -134,11 +97,11 @@
           <div class="filmstrip">
             <div class="filmstrip-item">
               <span>Mode</span>
-              <strong>Shared canvas</strong>
+              <strong>WASM stroke prep</strong>
             </div>
             <div class="filmstrip-item">
-              <span>Storage</span>
-              <strong>Local preview state</strong>
+              <span>Output</span>
+              <strong>Prepared points</strong>
             </div>
             <div class="filmstrip-item">
               <span>Feed</span>
@@ -168,6 +131,6 @@
       </main>
     </div>
 
-    <script src="./collab.js"></script>
+    <script src="./wasm-lab.js"></script>
   </body>
 </html>
