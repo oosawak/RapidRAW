@@ -118,10 +118,7 @@ export function rasterize_stroke_rgba(width, height, points, spacing, color, siz
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passStringToWasm0(color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.rasterize_stroke_rgba(width, height, ptr0, len0, spacing, ptr1, len1, size, opacity);
-    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-    return v2;
+    return wasm.rasterize_stroke_rgba(width, height, ptr0, len0, spacing, ptr1, len1, size, opacity);
 }
 
 /**
@@ -401,7 +398,7 @@ async function __wbg_init(module_or_path) {
     }
 
     if (module_or_path === undefined) {
-        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=8cb921de', import.meta.url);
+        module_or_path = new URL('rapidraw_wasm_bg.wasm?rev=c3f7a9d1', import.meta.url);
     }
     const imports = __wbg_get_imports();
 

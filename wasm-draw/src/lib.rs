@@ -96,14 +96,14 @@ pub fn rasterize_stroke_rgba(
     color: String,
     size: f32,
     opacity: f32,
-) -> Vec<u8> {
+) -> js_sys::Uint8Array {
     let pixel_count = match width.checked_mul(height).and_then(|px| px.checked_mul(4)) {
         Some(px) => px as usize,
-        None => return Vec::new(),
+        None => return js_sys::Uint8Array::new_with_length(0),
     };
     let mut buffer = vec![0u8; pixel_count];
     if width == 0 || height == 0 {
-        return buffer;
+        return js_sys::Uint8Array::new_with_length(0);
     }
 
     let path = interpolate_points(points, spacing);
@@ -121,7 +121,9 @@ pub fn rasterize_stroke_rgba(
         alpha,
     );
 
-    buffer
+    let pixels = js_sys::Uint8Array::from(buffer.as_slice());
+    std::mem::forget(buffer);
+    pixels
 }
 
 fn unpack_points(points: &[f32]) -> Vec<(f32, f32)> {
