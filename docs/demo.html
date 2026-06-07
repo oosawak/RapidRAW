@@ -27,6 +27,7 @@
         <div class="topbar-status">
           <span class="status-pill" id="statusPill">WASM canvas</span>
           <span class="muted" id="imageMeta">Canvas first. Guide is hidden by default and can be opened from the top bar.</span>
+          <span class="muted canvas-title-line" id="canvasTitleLine" hidden>Draw on the canvas</span>
         </div>
 
         <div class="topbar-actions">
@@ -151,12 +152,12 @@
         </section>
 
         <aside class="panel collab-panel-right">
-          <section class="card collapsible" data-collapsed="false">
+          <section class="card collapsible" data-collapsed="true">
             <div class="card-head">
               <h2>Stroke Feed</h2>
               <div class="card-head-actions">
                 <span class="chip">json</span>
-                <button class="icon-button" type="button" data-collapse-target="feedCard" aria-label="Toggle Stroke Feed panel">−</button>
+                <button class="icon-button" type="button" data-collapse-target="feedCard" aria-label="Toggle Stroke Feed panel">+</button>
               </div>
             </div>
             <div class="collapsible-body" id="feedCard">

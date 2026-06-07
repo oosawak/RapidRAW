@@ -33,12 +33,13 @@ window.addEventListener("load", async () => {
   const guideToggleButton = document.getElementById("guideToggleButton");
   const guidePanel = document.getElementById("guidePanel");
   const statusPill = document.getElementById("statusPill");
+  const canvasTitleLine = document.getElementById("canvasTitleLine");
   const strokeFeed = document.getElementById("strokeFeed");
   const strokeStats = document.getElementById("strokeStats");
   const fpsValue = document.getElementById("fpsValue");
   const collapseButtons = document.querySelectorAll("[data-collapse-target]");
 
-  if (!canvas || !shell || !userIdInput || !brushSizeInput || !brushColorInput || !addRemoteStrokeButton || !clearStrokesButton || !guideToggleButton || !guidePanel || !statusPill || !strokeFeed || !strokeStats || !fpsValue) {
+  if (!canvas || !shell || !userIdInput || !brushSizeInput || !brushColorInput || !addRemoteStrokeButton || !clearStrokesButton || !guideToggleButton || !guidePanel || !statusPill || !canvasTitleLine || !strokeFeed || !strokeStats || !fpsValue) {
     return;
   }
 
@@ -74,11 +75,17 @@ window.addEventListener("load", async () => {
   brushSizeInput.addEventListener("input", () => {
     const value = Number(brushSizeInput.value);
     drawSettings.size = Number.isFinite(value) ? value : drawSettings.size;
+    if (strokesState.activeStroke && strokesState.activeStroke.source === "local") {
+      strokesState.activeStroke.size = drawSettings.size;
+    }
     render();
   });
 
   brushColorInput.addEventListener("input", () => {
     drawSettings.color = brushColorInput.value || drawSettings.color;
+    if (strokesState.activeStroke && strokesState.activeStroke.source === "local") {
+      strokesState.activeStroke.color = drawSettings.color;
+    }
     render();
   });
 
@@ -118,6 +125,12 @@ window.addEventListener("load", async () => {
     renderFeed(strokeFeed);
   };
 
+  const updateCanvasState = () => {
+    const hasDrawing = Boolean(strokesState.activeStroke || strokesState.strokes.length);
+    shell.classList.toggle("has-drawn", hasDrawing);
+    canvasTitleLine.hidden = hasDrawing;
+  };
+
   const startFrameLoop = () => {
     const tick = (now) => {
       uiState.frameCount += 1;
@@ -142,6 +155,7 @@ window.addEventListener("load", async () => {
     canvas.setPointerCapture(event.pointerId);
     strokesState.activeStroke = createStroke("local", userIdInput.value || "me", pointerToPoint(event, canvas));
     strokesState.strokes = [...strokesState.strokes, strokesState.activeStroke].slice(-24);
+    updateCanvasState();
     persist();
     render();
   };
@@ -151,6 +165,7 @@ window.addEventListener("load", async () => {
       return;
     }
     appendPoint(strokesState.activeStroke, pointerToPoint(event, canvas));
+    updateCanvasState();
     persist();
     render();
   };
@@ -163,6 +178,7 @@ window.addEventListener("load", async () => {
     if (strokesState.activeStroke) {
       appendPoint(strokesState.activeStroke, pointerToPoint(event, canvas));
       strokesState.activeStroke = null;
+      updateCanvasState();
       persist();
     }
     render();
@@ -171,6 +187,7 @@ window.addEventListener("load", async () => {
   const onPointerCancel = () => {
     strokesState.pointerDown = false;
     strokesState.activeStroke = null;
+    updateCanvasState();
     render();
   };
 
@@ -189,6 +206,7 @@ window.addEventListener("load", async () => {
       { x: width * 0.84, y: height * 0.40, t: now + 64 },
     ];
     strokesState.strokes = [...strokesState.strokes, stroke].slice(-24);
+    updateCanvasState();
     persist();
     render();
   };
@@ -196,6 +214,7 @@ window.addEventListener("load", async () => {
   const clearStrokes = () => {
     strokesState.strokes = [];
     strokesState.activeStroke = null;
+    updateCanvasState();
     persist();
     render();
   };
@@ -211,6 +230,7 @@ window.addEventListener("load", async () => {
   window.addEventListener("resize", resize);
   window.addEventListener("orientationchange", resize);
 
+  updateCanvasState();
   resize();
   render();
   startFrameLoop();

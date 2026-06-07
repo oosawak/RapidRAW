@@ -1417,3 +1417,74 @@ body[data-wasm-error]::after {
     max-height: 180px;
   }
 }
+
+
+/* Canvas title and feed overrides */
+.topbar-status {
+  position: relative;
+}
+
+.canvas-title-line {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  opacity: 0.9;
+}
+
+.collab-canvas-shell .empty-state {
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease,
+    inset 220ms ease;
+}
+
+.collab-canvas-shell.has-drawn .empty-state {
+  inset: 10px auto auto 18px;
+  place-items: start;
+  opacity: 0.95;
+  transform: none;
+}
+
+.collab-canvas-shell.has-drawn .empty-card {
+  width: auto;
+  max-width: 340px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(8, 10, 15, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.collab-canvas-shell.has-drawn .empty-card h2 {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+}
+
+.collab-canvas-shell.has-drawn .empty-card p {
+  display: none;
+}
+
+.collab-canvas-shell.has-drawn .empty-card .eyebrow {
+  margin-bottom: 0;
+  font-size: 0.62rem;
+}
+
+.card[data-collapsed="true"] .collapsible-body {
+  max-height: 0;
+}
+
+.card[data-collapsed="true"] .collapsible-body .feed {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .collab-canvas-shell.has-drawn .empty-state {
+    inset: 8px auto auto 10px;
+  }
+
+  .collab-canvas-shell.has-drawn .empty-card {
+    max-width: 240px;
+    padding: 8px 10px;
+  }
+}
