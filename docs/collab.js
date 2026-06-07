@@ -77,6 +77,7 @@ window.addEventListener("load", async () => {
     drawSettings.size = Number.isFinite(value) ? value : drawSettings.size;
     if (strokesState.activeStroke && strokesState.activeStroke.source === "local") {
       strokesState.activeStroke.size = drawSettings.size;
+      strokesState.activeStroke.brushSize = drawSettings.size;
     }
     render();
   });
@@ -85,6 +86,7 @@ window.addEventListener("load", async () => {
     drawSettings.color = brushColorInput.value || drawSettings.color;
     if (strokesState.activeStroke && strokesState.activeStroke.source === "local") {
       strokesState.activeStroke.color = drawSettings.color;
+      strokesState.activeStroke.brushColor = drawSettings.color;
     }
     render();
   });
@@ -128,7 +130,7 @@ window.addEventListener("load", async () => {
   const updateCanvasState = () => {
     const hasDrawing = Boolean(strokesState.activeStroke || strokesState.strokes.length);
     shell.classList.toggle("has-drawn", hasDrawing);
-    canvasTitleLine.hidden = hasDrawing;
+    canvasTitleLine.hidden = false;
   };
 
   const startFrameLoop = () => {
@@ -153,7 +155,8 @@ window.addEventListener("load", async () => {
     }
     strokesState.pointerDown = true;
     canvas.setPointerCapture(event.pointerId);
-    strokesState.activeStroke = createStroke("local", userIdInput.value || "me", pointerToPoint(event, canvas));
+    const brush = getCurrentBrush();
+    strokesState.activeStroke = createStroke("local", userIdInput.value || "me", pointerToPoint(event, canvas), brush);
     strokesState.strokes = [...strokesState.strokes, strokesState.activeStroke].slice(-24);
     updateCanvasState();
     persist();
@@ -195,7 +198,7 @@ window.addEventListener("load", async () => {
     const width = shell.clientWidth;
     const height = shell.clientHeight;
     const now = Date.now();
-    const stroke = createStroke("remote", "remote-demo", null);
+    const stroke = createStroke("remote", "remote-demo", null, { color: "#74d6ff", size: 5 });
     stroke.color = "#74d6ff";
     stroke.size = 5;
     stroke.points = [
@@ -253,16 +256,20 @@ function loadStrokes() {
   }
 }
 
-function createStroke(source, userId, firstPoint) {
+function createStroke(source, userId, firstPoint, brush = null) {
   const seq = ++strokesState.seq;
   const isRemote = source === "remote";
+  const color = brush?.color ?? (isRemote ? "#74d6ff" : drawSettings.color);
+  const size = brush?.size ?? (isRemote ? 5 : drawSettings.size);
   return {
     seq,
     stroke_id: `${source}-${Date.now()}-${seq}`,
     user_id: userId,
     tool: "brush",
-    color: isRemote ? "#74d6ff" : drawSettings.color,
-    size: isRemote ? 5 : drawSettings.size,
+    color,
+    size,
+    brushColor: color,
+    brushSize: size,
     points: firstPoint ? [firstPoint] : [],
     timestamp: new Date().toISOString(),
     source,
@@ -306,15 +313,16 @@ function renderOverlay(context, width, height) {
 }
 
 function drawStroke(context, stroke) {
-  const points = getRenderablePoints(stroke.points || []);
+  const renderedStroke = getRenderableStroke(stroke);
+  const points = renderedStroke.points || [];
   if (points.length < 2) {
     return;
   }
   context.save();
   context.lineCap = "round";
   context.lineJoin = "round";
-  context.strokeStyle = stroke.color || "#f08c46";
-  context.lineWidth = stroke.size || 6;
+  context.strokeStyle = renderedStroke.color || stroke.color || "#f08c46";
+  context.lineWidth = renderedStroke.size || stroke.size || 6;
   context.globalAlpha = stroke.source === "remote" ? 0.75 : 0.95;
   context.beginPath();
   context.moveTo(points[0].x, points[0].y);
@@ -325,11 +333,25 @@ function drawStroke(context, stroke) {
   context.restore();
 }
 
-function getRenderablePoints(points) {
-  if (!wasmProcessor || typeof wasmProcessor.interpolateStroke !== "function") {
+function getRenderableStroke(stroke) {
+  if (!wasmProcessor || typeof wasmProcessor.prepareStroke !== "function") {
     throw new Error("WASM processor is not ready");
   }
-  return wasmProcessor.interpolateStroke(points, 6);
+  return wasmProcessor.prepareStroke(
+    stroke.points || [],
+    {
+      color: stroke.brushColor || stroke.color || "#f08c46",
+      size: stroke.brushSize || stroke.size || 6,
+    },
+    6,
+  );
+}
+
+function getCurrentBrush() {
+  return {
+    color: drawSettings.color,
+    size: drawSettings.size,
+  };
 }
 
 function renderStats(target, fpsValue) {

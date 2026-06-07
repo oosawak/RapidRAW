@@ -1,9 +1,1 @@
 *
-!.gitignore
-!README.md
-!bridge.js
-!package.json
-!rapidraw_wasm.js
-!rapidraw_wasm_bg.wasm
-!rapidraw_wasm.d.ts
-!rapidraw_wasm_bg.wasm.d.ts

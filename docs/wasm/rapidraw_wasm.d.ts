@@ -1,9 +1,20 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export class StrokePlan {
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    readonly color: string;
+    readonly points: Float32Array;
+    readonly size: number;
+}
+
 export function grade_rgba(input: Uint8Array, width: number, height: number, exposure: number, contrast: number, saturation: number, temperature: number, shadows: number, vignette: number, grain: number): Uint8Array;
 
 export function interpolate_stroke(points: Float32Array, spacing: number): Float32Array;
+
+export function prepare_stroke(points: Float32Array, spacing: number, color: string, size: number): StrokePlan;
 
 export function processor_name(): string;
 
@@ -13,9 +24,14 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly __wbg_strokeplan_free: (a: number, b: number) => void;
     readonly grade_rgba: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => [number, number];
     readonly interpolate_stroke: (a: number, b: number, c: number) => [number, number];
+    readonly prepare_stroke: (a: number, b: number, c: number, d: number, e: number, f: number) => number;
     readonly processor_name: () => [number, number];
+    readonly strokeplan_color: (a: number) => [number, number];
+    readonly strokeplan_points: (a: number) => [number, number];
+    readonly strokeplan_size: (a: number) => number;
     readonly start: () => void;
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

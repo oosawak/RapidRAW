@@ -99,25 +99,53 @@ pub fn grade_rgba(
     output
 }
 
-fn clamp255(value: f32) -> f32 {
-    value.clamp(0.0, 255.0)
+#[wasm_bindgen]
+pub struct StrokePlan {
+    points: Vec<f32>,
+    color: String,
+    size: f32,
 }
 
-fn pseudo_noise(x: u32, y: u32, grain_strength: f32) -> f32 {
-    let seed = x.wrapping_mul(374_761_393) ^ y.wrapping_mul(668_265_263) ^ 0x9E37_79B9;
-    let mixed = seed ^ (seed >> 13) ^ (seed << 17);
-    let normalized = (mixed & 0xffff) as f32 / 65_535.0;
-    (normalized - 0.5) * 36.0 * grain_strength
+#[wasm_bindgen]
+impl StrokePlan {
+    #[wasm_bindgen(getter)]
+    pub fn points(&self) -> Vec<f32> {
+        self.points.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn color(&self) -> String {
+        self.color.clone()
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn size(&self) -> f32 {
+        self.size
+    }
+}
+
+#[wasm_bindgen]
+pub fn prepare_stroke(points: Vec<f32>, spacing: f32, color: String, size: f32) -> StrokePlan {
+    let size = size.clamp(1.0, 64.0);
+    let spacing = spacing.max((size * 0.55).max(0.25));
+    StrokePlan {
+        points: interpolate_points(points, spacing),
+        color: normalize_color(&color),
+        size,
+    }
 }
 
 #[wasm_bindgen]
 pub fn interpolate_stroke(points: Vec<f32>, spacing: f32) -> Vec<f32> {
+    interpolate_points(points, spacing.max(0.25))
+}
+
+fn interpolate_points(points: Vec<f32>, spacing: f32) -> Vec<f32> {
     let mut output = Vec::new();
     if points.len() < 4 {
         return output;
     }
 
-    let spacing = spacing.max(0.25);
     let mut last_point: Option<(f32, f32)> = None;
 
     for chunk in points.chunks_exact(2) {
@@ -145,3 +173,38 @@ pub fn interpolate_stroke(points: Vec<f32>, spacing: f32) -> Vec<f32> {
     output
 }
 
+fn normalize_color(color: &str) -> String {
+    let trimmed = color.trim();
+    if let Some(expanded) = expand_hex_color(trimmed) {
+        return expanded;
+    }
+    "#f08c46".to_string()
+}
+
+fn expand_hex_color(color: &str) -> Option<String> {
+    let hex = color.strip_prefix('#')?;
+    match hex.len() {
+        3 => {
+            let chars: Vec<char> = hex.chars().collect();
+            Some(format!(
+                "#{0}{0}{1}{1}{2}{2}",
+                chars[0].to_ascii_uppercase(),
+                chars[1].to_ascii_uppercase(),
+                chars[2].to_ascii_uppercase()
+            ))
+        }
+        6 => Some(format!("#{}", hex.to_ascii_uppercase())),
+        _ => None,
+    }
+}
+
+fn clamp255(value: f32) -> f32 {
+    value.clamp(0.0, 255.0)
+}
+
+fn pseudo_noise(x: u32, y: u32, grain_strength: f32) -> f32 {
+    let seed = x.wrapping_mul(374_761_393) ^ y.wrapping_mul(668_265_263) ^ 0x9E37_79B9;
+    let mixed = seed ^ (seed >> 13) ^ (seed << 17);
+    let normalized = (mixed & 0xffff) as f32 / 65_535.0;
+    (normalized - 0.5) * 36.0 * grain_strength
+}

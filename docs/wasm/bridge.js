@@ -48,10 +48,19 @@ function createWasmProcessor(mod) {
       imageData.data.set(output);
       return imageData;
     },
-    interpolateStroke(points, spacing = 6) {
+    prepareStroke(points, brush, spacing = 6) {
       const flatInput = flattenPoints(points);
-      const output = mod.interpolate_stroke(flatInput, spacing);
-      return unflattenPoints(output);
+      const output = mod.prepare_stroke(
+        flatInput,
+        spacing,
+        brush?.color ?? "#f08c46",
+        brush?.size ?? 8,
+      );
+      return {
+        points: unflattenPoints(output.points),
+        color: output.color,
+        size: output.size,
+      };
     },
   };
 }

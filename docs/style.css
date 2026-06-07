@@ -1488,3 +1488,95 @@ body[data-wasm-error]::after {
     padding: 8px 10px;
   }
 }
+
+
+/* Canvas title and WASM-driven stroke overrides */
+.canvas-title-line {
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  opacity: 0.88;
+}
+
+.collab-canvas-shell .empty-state {
+  transition: opacity 220ms ease, transform 220ms ease, visibility 220ms ease;
+}
+
+.collab-canvas-shell.has-drawn .empty-state {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+.collab-canvas-shell.has-drawn .empty-card {
+  max-width: 340px;
+}
+
+.card[data-collapsed="true"] .collapsible-body {
+  max-height: 0;
+}
+
+.card[data-collapsed="true"] .collapsible-body .feed {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .canvas-title-line {
+    font-size: 0.68rem;
+  }
+}
+
+
+/* Final title behavior */
+.collab-canvas-shell .empty-state {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+.collab-canvas-shell.has-drawn .empty-card {
+  width: auto;
+  max-width: 320px;
+  padding: 12px 14px;
+}
+
+.collab-canvas-shell.has-drawn .empty-card h2 {
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.collab-canvas-shell.has-drawn .empty-card p {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .collab-canvas-shell.has-drawn .empty-card {
+    max-width: 240px;
+    padding: 10px 12px;
+  }
+}
+
+
+/* Final title behavior override */
+.collab-canvas-shell.has-drawn .empty-state {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+
+.collab-canvas-shell.has-drawn .empty-card h2 {
+  margin: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+}
+
+.collab-canvas-shell.has-drawn .empty-card p {
+  display: block !important;
+  margin-top: 0 !important;
+}
