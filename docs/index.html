@@ -26,12 +26,12 @@
 
         <div class="topbar-status">
           <span class="status-pill">Two previews</span>
-          <span class="muted">demo と RapidRAW の両方をここから確認します</span>
+          <span class="muted">demo と RapidRAW は別ページとして開きます</span>
         </div>
 
         <div class="topbar-actions">
-          <button class="button button-ghost" type="button" data-hub-nav="demo">Open Demo</button>
-          <button class="button button-ghost" type="button" data-hub-nav="rapidraw">Open RapidRAW</button>
+          <a class="button button-ghost" href="./demo.html" data-hub-nav="demo" target="_blank" rel="noreferrer">Open Demo</a>
+          <a class="button button-ghost" href="./rapidraw.html" data-hub-nav="rapidraw" target="_blank" rel="noreferrer">Open RapidRAW</a>
         </div>
       </header>
 
@@ -42,41 +42,53 @@
             <span class="chip">Pages only</span>
           </div>
           <p class="card-copy">
-            ここから、今作っている確認用画面と RapidRAW 風のプレビューを切り替えられます。
-            どちらも GitHub Pages で見られるようにしています。
+            ここから、今作っている確認用画面と RapidRAW 風のプレビューを開きます。
+            どちらも別ページとして GitHub Pages で見られるようにしています。
           </p>
 
           <div class="hub-launches">
-            <button class="hub-launch-card is-active" type="button" data-preview-src="./demo.html" data-label="Demo" data-copy="コラボ描画の確認用画面。キャンバスとストロークフィードを見られます。">
+            <a class="hub-launch-card is-active" href="./demo.html" target="_blank" rel="noreferrer" data-preview-src="./demo.html" data-label="Demo" data-copy="コラボ描画の確認用画面。キャンバスとストロークフィードを見られます。">
               <span class="hub-card-kicker">Preview</span>
               <strong>Demo</strong>
               <span class="hub-card-copy">確認用画面を開く</span>
-            </button>
-            <button class="hub-launch-card" type="button" data-preview-src="./rapidraw.html" data-label="RapidRAW" data-copy="RapidRAW 風の写真編集プレビュー。調整 UI と PNG 書き出しを確認できます。">
+            </a>
+            <a class="hub-launch-card" href="./rapidraw.html" target="_blank" rel="noreferrer" data-preview-src="./rapidraw.html" data-label="RapidRAW" data-copy="RapidRAW 風の写真編集プレビュー。調整 UI と PNG 書き出しを確認できます。">
               <span class="hub-card-kicker">Preview</span>
               <strong>RapidRAW</strong>
               <span class="hub-card-copy">写真編集の見た目を開く</span>
-            </button>
+            </a>
           </div>
 
           <div class="hub-note">
             <strong>Note</strong>
-            <span id="hubNote">最初は Demo を表示しています。右のプレビュー枠で切り替わります。</span>
+            <span id="hubNote">最初は Demo を選ぶ想定です。上のリンクから別ページを開いてください。</span>
           </div>
         </section>
 
-        <section class="card hub-preview">
+        <section class="card hub-structure">
           <div class="card-head">
-            <h2 id="previewTitle">Demo</h2>
-            <span class="chip" id="previewChip">./demo.html</span>
+            <h2>Project Structure</h2>
+            <span class="chip">docs</span>
           </div>
-          <div class="preview-frame-wrap">
-            <iframe id="previewFrame" title="Preview" src="./demo.html"></iframe>
-            <div class="preview-fallback" id="previewFallback">
-              <strong>Preview target</strong>
-              <span>表示されない場合はボタンから別タブで開いてください。</span>
-            </div>
-          </div>
+          <p class="card-copy">
+            このプロジェクトは `docs/index.html` を入口にし、`Demo` と `RapidRAW` を別ページとして開く構成です。<br />
+            `docs/demo.html` はお絵かきチャットの確認用画面、`docs/rapidraw.html` は RapidRAW 風の確認用画面です。<br />
+            描画の中身は `WASM` で処理し、ページの説明や導線は `docs/` 側で管理します。
+          </p>
+          <ul class="list">
+            <li>
+              <strong>Entry</strong>
+              <span>`index.html` から各ページへ移動する</span>
+            </li>
+            <li>
+              <strong>Demo</strong>
+              <span>コラボ描画の確認用画面</span>
+            </li>
+            <li>
+              <strong>RapidRAW</strong>
+              <span>写真編集プレビュー</span>
+            </li>
+          </ul>
         </section>
       </main>
     </div>

@@ -7,7 +7,7 @@
 - `docs/index.html`
 - ここを最初の導線にする
 - `Demo` と `RapidRAW` は別ページとして用意する
-- ボタンは `innerHTML` を差し替えるのではなく、別ページを読み込む
+- ボタンは `innerHTML` を差し替えるのではなく、別ページへ直接移動する
 
 ## 画面の役割
 
@@ -25,8 +25,8 @@
 ## 使い方
 
 - まず `index.html` を開く
-- `Demo` を選ぶと `demo.html` を表示する
-- `RapidRAW` を選ぶと `rapidraw.html` を表示する
+- `Demo` を選ぶと `demo.html` を開く
+- `RapidRAW` を選ぶと `rapidraw.html` を開く
 - どちらも GitHub Pages 内だけで完結させる
 
 ## この構成にした理由
@@ -40,4 +40,3 @@
 
 - この構成は、RapidRAW をベースに改造していく前提に合っている
 - `WASM` は描画の中身を担当し、画面の案内や表示は Pages 側で扱う
-
