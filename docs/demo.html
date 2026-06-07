@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Oekaki Chat Preview</title>
     <meta
       name="description"
@@ -25,7 +25,7 @@
         </div>
 
         <div class="topbar-status">
-          <span class="status-pill" id="statusPill">Local canvas</span>
+          <span class="status-pill" id="statusPill">WASM canvas</span>
           <span class="muted" id="imageMeta">Draw, add remote samples, and inspect the feed</span>
         </div>
 
@@ -48,6 +48,7 @@
             <span class="chip">local stroke</span>
             <span class="chip">remote sample</span>
             <span class="chip">stroke feed</span>
+            <span class="chip">fps</span>
           </div>
         </div>
 
@@ -73,26 +74,36 @@
 
       <main class="collab-grid">
         <aside class="panel collab-panel-left">
-          <section class="card">
+          <section class="card collapsible" data-collapsed="false">
             <div class="card-head">
               <h2>Session</h2>
-              <span class="chip">Pages</span>
+              <div class="card-head-actions">
+                <span class="chip">Pages</span>
+                <button class="icon-button" type="button" data-collapse-target="sessionCard" aria-label="Toggle Session panel">−</button>
+              </div>
             </div>
-            <p class="card-copy">
-              これは Pages で確認するためのコラボ描画プレビューです。ここで書いた線はローカル保存されます。
-            </p>
-            <label class="field">
-              <span>User ID</span>
-              <input id="userIdInput" type="text" value="me" />
-            </label>
+            <div class="collapsible-body" id="sessionCard">
+              <p class="card-copy">
+                これは Pages で確認するためのコラボ描画プレビューです。ここで書いた線はローカル保存されます。
+              </p>
+              <label class="field">
+                <span>User ID</span>
+                <input id="userIdInput" type="text" value="me" />
+              </label>
+            </div>
           </section>
 
-          <section class="card">
+          <section class="card collapsible" data-collapsed="false">
             <div class="card-head">
               <h2>Stroke Stats</h2>
-              <span class="chip">live</span>
+              <div class="card-head-actions">
+                <span class="chip">live</span>
+                <button class="icon-button" type="button" data-collapse-target="statsCard" aria-label="Toggle Stroke Stats panel">−</button>
+              </div>
             </div>
-            <dl class="status-grid" id="strokeStats"></dl>
+            <div class="collapsible-body" id="statsCard">
+              <dl class="status-grid" id="strokeStats"></dl>
+            </div>
           </section>
         </aside>
 
@@ -123,16 +134,25 @@
               <span>Feed</span>
               <strong>Recent strokes</strong>
             </div>
+            <div class="filmstrip-item">
+              <span>FPS</span>
+              <strong id="fpsValue">0</strong>
+            </div>
           </div>
         </section>
 
         <aside class="panel collab-panel-right">
-          <section class="card">
+          <section class="card collapsible" data-collapsed="false">
             <div class="card-head">
               <h2>Stroke Feed</h2>
-              <span class="chip">json</span>
+              <div class="card-head-actions">
+                <span class="chip">json</span>
+                <button class="icon-button" type="button" data-collapse-target="feedCard" aria-label="Toggle Stroke Feed panel">−</button>
+              </div>
             </div>
-            <pre class="feed" id="strokeFeed"></pre>
+            <div class="collapsible-body" id="feedCard">
+              <pre class="feed" id="strokeFeed"></pre>
+            </div>
           </section>
         </aside>
       </main>

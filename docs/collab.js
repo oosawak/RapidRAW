@@ -2,12 +2,20 @@ let wasmProcessor = null;
 let wasmProcessorPromise = null;
 
 const STORAGE_KEY = "rapidraw-studio-strokes";
+const FPS_SAMPLE_MS = 1000;
 
 const strokesState = {
   strokes: [],
   activeStroke: null,
   pointerDown: false,
   seq: 0,
+};
+
+const uiState = {
+  fpsValue: 0,
+  lastFpsTick: performance.now(),
+  frameCount: 0,
+  rafId: 0,
 };
 
 window.addEventListener("load", async () => {
@@ -26,14 +34,31 @@ window.addEventListener("load", async () => {
   const clearStrokesButton = document.getElementById("clearStrokesButton");
   const strokeFeed = document.getElementById("strokeFeed");
   const strokeStats = document.getElementById("strokeStats");
+  const fpsValue = document.getElementById("fpsValue");
+  const collapseButtons = document.querySelectorAll("[data-collapse-target]");
 
-  if (!canvas || !shell || !userIdInput || !addRemoteStrokeButton || !clearStrokesButton || !strokeFeed || !strokeStats) {
+  if (!canvas || !shell || !userIdInput || !addRemoteStrokeButton || !clearStrokesButton || !strokeFeed || !strokeStats || !fpsValue) {
     return;
   }
 
   const context = canvas.getContext("2d", { alpha: true });
   strokesState.strokes = loadStrokes();
   strokesState.seq = strokesState.strokes.reduce((max, stroke) => Math.max(max, Number(stroke.seq || 0)), 0);
+
+  collapseButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.getAttribute("data-collapse-target");
+      const card = button.closest(".collapsible");
+      const body = targetId ? document.getElementById(targetId) : null;
+      if (!card || !body) {
+        return;
+      }
+      const collapsed = card.dataset.collapsed === "true";
+      card.dataset.collapsed = String(!collapsed);
+      button.textContent = collapsed ? "−" : "+";
+      button.setAttribute("aria-expanded", String(!collapsed));
+    });
+  });
 
   const resize = () => {
     const width = shell.clientWidth;
@@ -52,8 +77,23 @@ window.addEventListener("load", async () => {
     const height = shell.clientHeight;
     context.clearRect(0, 0, width, height);
     renderOverlay(context, width, height);
-    renderStats(strokeStats);
+    renderStats(strokeStats, fpsValue);
     renderFeed(strokeFeed);
+  };
+
+  const startFrameLoop = () => {
+    const tick = (now) => {
+      uiState.frameCount += 1;
+      const elapsed = now - uiState.lastFpsTick;
+      if (elapsed >= FPS_SAMPLE_MS) {
+        uiState.fpsValue = Math.round((uiState.frameCount * 1000) / elapsed);
+        uiState.frameCount = 0;
+        uiState.lastFpsTick = now;
+        fpsValue.textContent = String(uiState.fpsValue);
+      }
+      uiState.rafId = window.requestAnimationFrame(tick);
+    };
+    uiState.rafId = window.requestAnimationFrame(tick);
   };
 
   const onPointerDown = (event) => {
@@ -132,9 +172,11 @@ window.addEventListener("load", async () => {
   clearStrokesButton.addEventListener("click", clearStrokes);
   userIdInput.addEventListener("input", render);
   window.addEventListener("resize", resize);
+  window.addEventListener("orientationchange", resize);
 
   resize();
   render();
+  startFrameLoop();
 
   function persist() {
     try {
@@ -232,7 +274,7 @@ function getRenderablePoints(points) {
   return wasmProcessor.interpolateStroke(points, 6);
 }
 
-function renderStats(target) {
+function renderStats(target, fpsValue) {
   const localCount = strokesState.strokes.filter((stroke) => stroke.source === "local").length;
   const remoteCount = strokesState.strokes.filter((stroke) => stroke.source === "remote").length;
   const active = strokesState.activeStroke ? strokesState.activeStroke.stroke_id : "none";
@@ -242,6 +284,7 @@ function renderStats(target) {
     ["Remote", String(remoteCount)],
     ["Active", active],
     ["Tool", "brush"],
+    ["FPS", String(uiState.fpsValue)],
   ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
     dt.textContent = label;
@@ -249,6 +292,7 @@ function renderStats(target) {
     dd.textContent = value;
     target.append(dt, dd);
   });
+  fpsValue.textContent = String(uiState.fpsValue);
 }
 
 function renderFeed(target) {
