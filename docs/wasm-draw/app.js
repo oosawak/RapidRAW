@@ -1,6 +1,6 @@
 let wasmProcessor = null;
 let wasmProcessorPromise = null;
-const WASM_DRAW_REV = 'a4c1d2e7';
+const WASM_DRAW_REV = 'b1f3a9c2';
 
 const state = {
   strokes: [],
